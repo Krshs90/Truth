@@ -82,6 +82,10 @@ export const CivicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   useEffect(() => {
+    // In test environment, skip background automatic network fetch to prevent act() warnings
+    if (import.meta.env?.MODE === 'test') {
+      return;
+    }
     checkOllamaHealth();
   }, []);
 

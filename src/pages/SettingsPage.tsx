@@ -5,9 +5,11 @@ import {
   RefreshCw,
   CheckCircle2,
   Lock,
+  Sparkles,
 } from 'lucide-react';
 import { useCivic } from '../context/CivicContext';
 import { NonpartisanDisclaimer } from '../components/ui/NonpartisanDisclaimer';
+import { OnboardingModal } from '../components/onboarding/OnboardingModal';
 
 export const SettingsPage: React.FC = () => {
   const {
@@ -27,6 +29,7 @@ export const SettingsPage: React.FC = () => {
   const [isTesting, setIsTesting] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [resetConfirm, setResetConfirm] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
 
   const handleSaveOllama = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,14 +58,26 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-300 max-w-4xl mx-auto pb-12">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight">
-          Settings & Local Configuration
-        </h1>
-        <p className="text-sm text-slate-600 mt-1 leading-relaxed">
-          Manage your district preferences, local privacy controls, and optional local AI inference settings.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight">
+            Settings & Local Configuration
+          </h1>
+          <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+            Manage your district preferences, local privacy controls, and optional local AI inference settings.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowWizard(true)}
+          className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer shadow-xs shrink-0"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+          <span>Launch District Setup Wizard</span>
+        </button>
       </div>
+
+      <OnboardingModal isOpen={showWizard} onClose={() => setShowWizard(false)} />
 
       {saveMessage && (
         <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2">

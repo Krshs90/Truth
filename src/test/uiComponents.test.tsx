@@ -12,6 +12,7 @@ import { ComparePage } from '../pages/ComparePage';
 import { GovernmentPage } from '../pages/GovernmentPage';
 import { SourcesPage } from '../pages/SourcesPage';
 import { SettingsPage } from '../pages/SettingsPage';
+import { OnboardingModal } from '../components/onboarding/OnboardingModal';
 
 function renderWithProviders(ui: React.ReactElement, initialRoute = '/') {
   const queryClient = new QueryClient({
@@ -79,5 +80,13 @@ describe('UI Functional Integration Tests', () => {
     expect(screen.getByText('Settings & Local Configuration')).toBeInTheDocument();
     expect(screen.getByText('Privacy & Data Architecture Standards')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Optional Local AI Inference/i })).toBeInTheDocument();
+  });
+
+  it('Renders Onboarding modal with mission, district setup, and nonpartisan pledge', () => {
+    renderWithProviders(<OnboardingModal isOpen={true} onClose={() => {}} />);
+    expect(screen.getByText('See beyond the political spin.')).toBeInTheDocument();
+    expect(screen.getByText('Strictly Nonpartisan')).toBeInTheDocument();
+    expect(screen.getByText('Primary Sources First')).toBeInTheDocument();
+    expect(screen.getByText('Continue')).toBeInTheDocument();
   });
 });

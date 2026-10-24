@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import {
   Scale,
@@ -13,14 +13,24 @@ import {
   ShieldCheck,
   ExternalLink,
   Cpu,
+  Sparkles,
 } from 'lucide-react';
 import { useCivic } from '../../context/CivicContext';
+import { OnboardingModal } from '../onboarding/OnboardingModal';
 
 export const AppShell: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { selectedCongressional, selectedStateSenate, selectedStateHouse, ollamaStatus } = useCivic();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const hasOnboarded = localStorage.getItem('truth_onboarded_v1');
+    if (!hasOnboarded) {
+      setShowOnboarding(true);
+    }
+  }, []);
 
   const navItems = [
     { to: '/', label: 'Overview', icon: Scale },
@@ -42,6 +52,9 @@ export const AppShell: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row text-slate-900 font-sans">
+      {/* Onboarding Dialog for First-Time Users or Replay */}
+      <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
+
       {/* Mobile Top Header */}
       <header className="md:hidden bg-[#0B132B] text-white border-b border-slate-800 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
         <Link to="/" className="flex items-center gap-2.5">
@@ -53,13 +66,23 @@ export const AppShell: React.FC = () => {
             <div className="text-[10px] text-slate-400 font-medium">See beyond the spin.</div>
           </div>
         </Link>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-1.5 text-slate-300 hover:text-white rounded-md hover:bg-slate-800 transition-colors"
-          aria-label="Toggle navigation menu"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6 text-white" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowOnboarding(true)}
+            className="p-1.5 text-blue-400 hover:text-white rounded-md text-xs font-semibold flex items-center gap-1 bg-slate-800"
+            title="Configure district"
+          >
+            <MapPin className="w-3.5 h-3.5" />
+            <span className="text-[11px]">District</span>
+          </button>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-1.5 text-slate-300 hover:text-white rounded-md hover:bg-slate-800 transition-colors"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6 text-white" />}
+          </button>
+        </div>
       </header>
 
       {/* Desktop Persistent Sidebar */}
@@ -123,17 +146,19 @@ export const AppShell: React.FC = () => {
         {/* Selected District Quick Summary in Sidebar Footer */}
         <div className="p-3.5 mx-3 mb-3 bg-[#1C2541] rounded-lg border border-slate-700/60 text-xs text-slate-300">
           <div className="flex items-center justify-between text-slate-400 mb-1.5 font-medium text-[11px]">
-            <span className="flex items-center gap-1.5 text-blue-400">
+            <span className="flex items-center gap-1.5 text-blue-400 font-semibold">
               <MapPin className="w-3.5 h-3.5" />
               <span>MY TEXAS DISTRICT</span>
             </span>
-            <Link
-              to="/district"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-blue-400 hover:underline hover:text-blue-300 text-[11px]"
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setShowOnboarding(true);
+              }}
+              className="text-blue-400 hover:underline hover:text-blue-300 text-[11px] cursor-pointer"
             >
               Change
-            </Link>
+            </button>
           </div>
           <div className="font-medium text-slate-200 truncate">
             {selectedCongressional.name.replace('Texas Congressional District', 'US CD-')}
@@ -150,7 +175,7 @@ export const AppShell: React.FC = () => {
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Nonpartisan & Cited</span>
             </span>
-            <span className="text-slate-500 font-mono text-[10px]">v1.0-MVP</span>
+            <span className="text-slate-500 font-mono text-[10px]">v1.3-LIVE</span>
           </div>
           <div className="flex items-center justify-between text-slate-400">
             <span className="flex items-center gap-1">
@@ -176,23 +201,33 @@ export const AppShell: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search claims, bills (e.g. SB 2), candidates, or paste a quote..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-100 hover:bg-slate-50 focus:bg-white text-sm rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400"
+              className="w-full pl-9 pr-4 py-2 bg-slate-100 hover:bg-slate-50 focus:bg-white text-sm rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all placeholder:text-slate-400 font-sans"
             />
           </form>
 
-          {/* Right Header Status Badges */}
-          <div className="hidden lg:flex items-center gap-4 text-xs text-slate-600">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 rounded-md border border-slate-200">
+          {/* Right Header Controls & Badges */}
+          <div className="flex items-center gap-3 text-xs text-slate-600">
+            <button
+              type="button"
+              onClick={() => setShowOnboarding(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+              <span>District Setup</span>
+            </button>
+
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-lg border border-slate-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span className="font-medium text-slate-700">Verified Dataset: Oct 2024</span>
+              <span className="font-medium text-slate-700">Verified: Primary Journals</span>
             </div>
+
             <a
               href="https://capitol.texas.gov/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-slate-500 hover:text-blue-700 transition-colors"
+              className="hidden sm:flex items-center gap-1 text-slate-500 hover:text-blue-700 transition-colors"
             >
-              <span>Texas Legislature Online</span>
+              <span>Texas Capitol</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
