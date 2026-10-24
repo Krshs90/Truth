@@ -31,7 +31,7 @@ function createMainWindow() {
     frame: false,
     titleBarStyle: 'hidden',
     backgroundColor: '#141414',
-    show: false,
+    show: true,
     center: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -43,21 +43,40 @@ function createMainWindow() {
     },
   });
 
+  const revealWindow = () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      if (!mainWindow.isVisible()) {
+        mainWindow.show();
+      }
+      mainWindow.focus();
+    }
+  };
+
+  mainWindow.once('ready-to-show', revealWindow);
+  mainWindow.webContents.once('did-finish-load', () => {
+    console.log('[Truth Desktop] WebContents finished loading.');
+    revealWindow();
+  });
+
+  // Guarantee window visibility after timeout
+  setTimeout(revealWindow, 1200);
+
   if (isDev) {
     const devUrl = 'http://127.0.0.1:5173';
+    console.log(`[Truth Desktop] Loading dev URL: ${devUrl}`);
     mainWindow.loadURL(devUrl);
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
 
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
-    mainWindow.focus();
-  });
-
-  mainWindow.webContents.on('did-fail-load', () => {
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription) => {
+    console.warn(`[Truth Desktop] Failed to load (${errorCode}: ${errorDescription}), retrying...`);
     if (isDev && mainWindow && !mainWindow.isDestroyed()) {
-      setTimeout(() => mainWindow?.loadURL('http://127.0.0.1:5173'), 800);
+      setTimeout(() => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.loadURL('http://127.0.0.1:5173');
+        }
+      }, 800);
     }
   });
 
