@@ -28,14 +28,12 @@ export const ClaimDetailPage: React.FC = () => {
   useEffect(() => {
     if (!id) return;
 
-    // Check predefined claims
     const found = CLAIMS.find((c) => c.id === id);
     if (found) {
       setClaim(found);
       return;
     }
 
-    // Check user session storage for newly generated claim
     const stored = sessionStorage.getItem(`truth_claim_${id}`);
     if (stored) {
       try {
@@ -48,7 +46,7 @@ export const ClaimDetailPage: React.FC = () => {
 
   if (!claim) {
     return (
-      <div className="py-16 text-center space-y-4 animate-in fade-in">
+      <div className="py-20 text-center space-y-4 animate-in fade-in">
         <HelpCircle className="w-12 h-12 text-slate-400 mx-auto" />
         <h1 className="text-xl font-bold text-slate-800">Investigation Record Not Found</h1>
         <p className="text-sm text-slate-500 max-w-md mx-auto">
@@ -56,7 +54,7 @@ export const ClaimDetailPage: React.FC = () => {
         </p>
         <Link
           to="/investigate"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-500 transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-500 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Return to Investigation Workspace</span>
@@ -74,7 +72,7 @@ export const ClaimDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto animate-in fade-in duration-300 pb-12">
+    <div className="space-y-10 max-w-4xl mx-auto animate-in fade-in duration-200 pb-12">
       {/* Back and Action Toolbar */}
       <div className="flex items-center justify-between">
         <Link
@@ -88,78 +86,81 @@ export const ClaimDetailPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopyLink}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 font-medium transition-colors cursor-pointer"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>{copiedLink ? 'Link Copied!' : 'Share Dossier'}</span>
           </button>
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-700 hover:bg-slate-50 font-medium transition-colors cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Print Report</span>
+            <span>Print Dossier</span>
           </button>
         </div>
       </div>
 
       {/* Primary Dossier Header Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-xs space-y-6">
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-7 md:p-9 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider font-mono">
-              REPORT REF: {claim.id}
+          <div className="flex items-center gap-2 text-xs">
+            <span className="font-bold text-slate-600 font-mono tracking-wider">
+              DOSSIER {claim.id}
             </span>
             <span className="text-slate-300">•</span>
-            <span className="text-xs font-medium text-slate-500">
+            <span className="text-slate-500 font-medium">
               Assessed: {assessment.lastAssessedAt}
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Verdict:</span>
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs text-slate-500 font-medium">Analytical Verdict:</span>
             <VerdictBadge verdict={assessment.verdict} size="md" />
           </div>
         </div>
 
-        {/* Section 1: Original Claim */}
-        <div>
-          <div className="text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <FileText className="w-3.5 h-3.5" />
-            <span>1. Original Submitted Claim</span>
+        {/* Section 1: Original Claim (Refined typography, no thick border bar) */}
+        <div className="space-y-3">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5 text-slate-400" />
+            <span>1. Submitted Claim Under Investigation</span>
           </div>
-          <blockquote className="text-xl md:text-2xl font-serif font-medium text-slate-900 border-l-4 border-blue-600 pl-4 py-1 leading-snug">
+
+          <blockquote className="text-2xl md:text-3xl font-serif text-slate-900 leading-snug tracking-tight">
             "{claim.claimText}"
           </blockquote>
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-slate-600 pt-1">
             {claim.speakerOrSource && (
               <span>
-                <strong>Speaker / Source:</strong> {claim.speakerOrSource}
+                <strong>Attributed Speaker / Entity:</strong> {claim.speakerOrSource}
               </span>
             )}
             {claim.contextOrEvent && (
               <span>
-                <strong>Context:</strong> {claim.contextOrEvent}
+                <strong>Setting:</strong> {claim.contextOrEvent}
               </span>
             )}
             <span>
-              <strong>Topic:</strong> {claim.topic}
+              <strong>Topic Area:</strong> {claim.topic}
             </span>
           </div>
         </div>
 
         {/* Section 2: Executive Summary Explanation */}
-        <div className="bg-slate-50 rounded-xl p-4 md:p-5 border border-slate-200">
-          <div className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <Info className="w-4 h-4 text-slate-600" />
-            <span>2. Analytical Summary</span>
+        <div className="bg-slate-50 rounded-xl p-5 border border-slate-200/80 space-y-3">
+          <div className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <Info className="w-4 h-4 text-blue-700" />
+            <span>2. Grounded Analytical Summary</span>
           </div>
-          <p className="text-sm md:text-base text-slate-800 leading-relaxed">
+
+          <p className="text-sm md:text-base text-slate-800 leading-relaxed font-sans">
             {assessment.shortExplanation}
           </p>
-          <div className="mt-3 pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500">
-            <span>Methodology: {assessment.methodologyVersion}</span>
+
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+            <span>Audit Standard: {assessment.methodologyVersion}</span>
             <span>
               Engine:{' '}
               {assessment.assessedBy === 'local_ollama_verified'
@@ -170,27 +171,27 @@ export const ClaimDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Section 3: Key Factual Assertions Breakdown */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+      {/* Section 3: Decomposition of Factual Assertions */}
+      <section className="bg-white rounded-xl border border-slate-200 p-6 md:p-8 space-y-4">
         <div className="flex items-center gap-2">
-          <Scale className="w-5 h-5 text-blue-600" />
+          <Scale className="w-5 h-5 text-blue-700" />
           <h2 className="text-base font-bold text-slate-900">
             3. Decomposition of Factual Assertions
           </h2>
         </div>
-        <p className="text-xs text-slate-500">
-          Truth isolates each factual statement from subjective opinions or rhetoric to test whether evidence substantiates the specific premise.
+        <p className="text-xs text-slate-600">
+          Truth isolates individual factual assertions from subjective rhetoric or forward-looking predictions, testing whether public records verify each component.
         </p>
 
-        <div className="space-y-3 pt-1">
+        <div className="space-y-3 pt-2">
           {assessment.keyAssertions.map((asrt, index) => (
             <div
               key={asrt.id || index}
-              className="p-4 rounded-lg border border-slate-200 bg-slate-50/70 space-y-2"
+              className="p-4 rounded-xl border border-slate-200/80 bg-slate-50/50 space-y-2"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold font-mono">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-slate-200 text-slate-800 flex items-center justify-center text-xs font-bold font-mono">
                     {index + 1}
                   </span>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200 uppercase tracking-wide">
@@ -219,7 +220,7 @@ export const ClaimDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="text-sm font-medium text-slate-900 pl-7">
+              <div className="text-sm font-semibold text-slate-900 pl-7">
                 "{asrt.assertionText}"
               </div>
 
@@ -229,12 +230,12 @@ export const ClaimDetailPage: React.FC = () => {
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Section 4 & 5: Evidence Supporting vs Contradicting/Qualifying */}
-      <div className="grid grid-cols-1 gap-6">
+      {/* Section 4 & 5: Supporting vs Contradicting Evidence */}
+      <section className="space-y-6">
         {/* Supporting Evidence */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-6 md:p-8 space-y-4">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             <h2 className="text-base font-bold text-slate-900">
@@ -251,7 +252,7 @@ export const ClaimDetailPage: React.FC = () => {
               {assessment.supportingEvidence.map((ev) => (
                 <div
                   key={ev.id}
-                  className="p-4 bg-emerald-50/40 rounded-xl border border-emerald-200/80 space-y-2"
+                  className="p-5 bg-emerald-50/30 rounded-xl border border-emerald-200/70 space-y-2.5"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                     <span className="font-semibold text-xs text-slate-900">
@@ -262,7 +263,7 @@ export const ClaimDetailPage: React.FC = () => {
                     </span>
                   </div>
 
-                  <blockquote className="text-xs text-slate-800 bg-white p-3 rounded border border-emerald-100 font-mono leading-relaxed">
+                  <blockquote className="text-xs text-slate-800 bg-white p-3 rounded-lg border border-emerald-100 font-mono leading-relaxed">
                     "{ev.excerpt}"
                   </blockquote>
 
@@ -286,7 +287,7 @@ export const ClaimDetailPage: React.FC = () => {
         </div>
 
         {/* Contradicting or Qualifying Evidence */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-6 md:p-8 space-y-4">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-amber-600" />
             <h2 className="text-base font-bold text-slate-900">
@@ -303,7 +304,7 @@ export const ClaimDetailPage: React.FC = () => {
               {assessment.contradictingOrQualifyingEvidence.map((ev) => (
                 <div
                   key={ev.id}
-                  className="p-4 bg-amber-50/50 rounded-xl border border-amber-200/80 space-y-2"
+                  className="p-5 bg-amber-50/30 rounded-xl border border-amber-200/70 space-y-2.5"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                     <span className="font-semibold text-xs text-slate-900">
@@ -314,7 +315,7 @@ export const ClaimDetailPage: React.FC = () => {
                     </span>
                   </div>
 
-                  <blockquote className="text-xs text-slate-800 bg-white p-3 rounded border border-amber-100 font-mono leading-relaxed">
+                  <blockquote className="text-xs text-slate-800 bg-white p-3 rounded-lg border border-amber-100 font-mono leading-relaxed">
                     "{ev.excerpt}"
                   </blockquote>
 
@@ -336,14 +337,14 @@ export const ClaimDetailPage: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Section 6 & 9: Missing Context & Remaining Uncertainty */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-3">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-3">
           <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-blue-600" />
-            <span>6. Missing Context & Nuance</span>
+            <AlertCircle className="w-4 h-4 text-blue-700" />
+            <span>6. Missing Context & Omissions</span>
           </h3>
           {assessment.missingContext.length === 0 ? (
             <p className="text-xs text-slate-500">No omitted context flagged.</p>
@@ -358,7 +359,7 @@ export const ClaimDetailPage: React.FC = () => {
           )}
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-3">
+        <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-3">
           <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
             <HelpCircle className="w-4 h-4 text-slate-500" />
             <span>9. Remaining Evidential Uncertainty</span>
@@ -377,17 +378,17 @@ export const ClaimDetailPage: React.FC = () => {
             </ul>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Section 7 & 8: Primary Source Documents & Independent Fact-Checks */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+      {/* Section 7 & 8: Original Source Documents */}
+      <section className="bg-white rounded-xl border border-slate-200 p-6 md:p-8 space-y-4">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-blue-600" />
+          <BookOpen className="w-5 h-5 text-blue-700" />
           <h2 className="text-base font-bold text-slate-900">
             7 & 8. Original Source Documents & Reporting Directory
           </h2>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-600">
           Inspect the exact primary sources and independent reporting referenced in this report.
         </p>
 
@@ -415,15 +416,15 @@ export const ClaimDetailPage: React.FC = () => {
             />
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Section 10: Methodology & Limitations */}
-      <div className="p-4 bg-slate-100 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1.5">
-        <div className="font-semibold text-slate-800">10. Methodology & Limitations</div>
+      <div className="p-5 bg-slate-100/70 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2">
+        <div className="font-bold text-slate-800">10. Methodology & Limitations</div>
         <p className="leading-relaxed">
           {assessment.methodologyAndLimitations}
         </p>
-        <p className="text-[11px] text-slate-500 pt-1">
+        <p className="text-[11px] text-slate-500">
           Analytical verdicts reflect an assessment of available primary source documentation. Truth does not pass moral judgment on candidates or political parties.
         </p>
       </div>

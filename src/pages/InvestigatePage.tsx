@@ -34,8 +34,15 @@ export const InvestigatePage: React.FC = () => {
   const [isInvestigating, setIsInvestigating] = useState(false);
   const [selectedTopicFilter, setSelectedTopicFilter] = useState<string>('All');
 
-  // Filter research library claims
-  const topics = ['All', 'Taxes & State Budget', 'Education & School Choice', 'Border & Criminal Justice', 'Healthcare & Public Health', 'Energy & Power Grid', 'Elections & Voting Rights'];
+  const topics = [
+    'All',
+    'Taxes & State Budget',
+    'Education & School Choice',
+    'Border & Criminal Justice',
+    'Healthcare & Public Health',
+    'Energy & Power Grid',
+    'Elections & Voting Rights',
+  ];
 
   const filteredLibraryClaims = CLAIMS.filter((c) => {
     if (selectedTopicFilter !== 'All' && c.topic !== selectedTopicFilter) return false;
@@ -48,7 +55,6 @@ export const InvestigatePage: React.FC = () => {
     }
   }, [queryParam]);
 
-  // Handle URL fetcher
   const handleFetchUrl = async () => {
     if (!urlInput.trim()) return;
     setIsScrapingUrl(true);
@@ -77,7 +83,6 @@ export const InvestigatePage: React.FC = () => {
     }
   };
 
-  // Run structured investigation
   const handleRunInvestigation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!claimText.trim()) return;
@@ -92,7 +97,6 @@ export const InvestigatePage: React.FC = () => {
         ollamaModel: ollamaConfig.model,
       });
 
-      // Save user investigation to session memory / storage so detail page can load it
       sessionStorage.setItem(`truth_claim_${result.claim.id}`, JSON.stringify(result.claim));
       navigate(`/investigate/${result.claim.id}`);
     } catch (err) {
@@ -103,69 +107,70 @@ export const InvestigatePage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Page Header */}
+    <div className="space-y-10 animate-in fade-in duration-200">
+      {/* Editorial Header */}
       <div>
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-800 text-xs rounded-full font-medium mb-2">
-          <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-          <span>EVIDENCE-BASED INVESTIGATION WORKSPACE</span>
-        </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+        <h1 className="text-2xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight">
           Investigate Political Claims
         </h1>
-        <p className="text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
-          Submit any political statement, campaign ad quote, or legislative assertion. Our transparent pipeline breaks the claim into individual assertions and tests each against verified government records.
+        <p className="text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
+          Submit any political statement, campaign ad quotation, or legislative assertion. Our transparent pipeline breaks the claim into individual assertions and tests each against verified government records.
         </p>
       </div>
 
-      {/* 4-Step Pipeline Architecture Explainer */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
-        <div className="flex items-center gap-2 mb-3">
-          <Layers className="w-4 h-4 text-blue-600" />
-          <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-            Traceable 4-Step Verification Pipeline
-          </h2>
+      {/* Structured Pipeline Timeline Ribbon (No repetitive 4-card template) */}
+      <div className="bg-slate-900 text-white rounded-xl p-5 border border-slate-800">
+        <div className="flex items-center gap-2 mb-4 text-xs font-bold text-blue-400 uppercase tracking-wider">
+          <Layers className="w-4 h-4" />
+          <span>Transparent 4-Stage Verification Architecture</span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-            <div className="font-bold text-blue-700">1. Extract Claims</div>
-            <p className="text-slate-600 mt-1">
-              Separates factual claims from opinions, future predictions, and value judgments.
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+          <div className="space-y-1 border-l sm:border-l-0 sm:border-t border-slate-700 pt-2 pl-3 sm:pl-0">
+            <span className="font-mono text-[10px] text-blue-400 font-bold">01 / EXTRACTION</span>
+            <div className="font-bold text-slate-100">Extract Claims</div>
+            <p className="text-slate-400 leading-relaxed text-[11px]">
+              Isolates empirical factual assertions from predictions and rhetorical opinions.
             </p>
           </div>
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-            <div className="font-bold text-blue-700">2. Retrieve Evidence</div>
-            <p className="text-slate-600 mt-1">
-              Queries indexed official bills, roll-call votes, and nonpartisan journals.
+
+          <div className="space-y-1 border-l sm:border-l-0 sm:border-t border-slate-700 pt-2 pl-3 sm:pl-0">
+            <span className="font-mono text-[10px] text-blue-400 font-bold">02 / RETRIEVAL</span>
+            <div className="font-bold text-slate-100">Retrieve Evidence</div>
+            <p className="text-slate-400 leading-relaxed text-[11px]">
+              Scans indexed official statutes, roll-call tallies, and nonpartisan journals.
             </p>
           </div>
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-            <div className="font-bold text-blue-700">3. Evaluate Evidence</div>
-            <p className="text-slate-600 mt-1">
-              Checks dates, jurisdiction, missing context, and potential misrepresentations.
+
+          <div className="space-y-1 border-l sm:border-l-0 sm:border-t border-slate-700 pt-2 pl-3 sm:pl-0">
+            <span className="font-mono text-[10px] text-blue-400 font-bold">03 / EVALUATION</span>
+            <div className="font-bold text-slate-100">Evaluate Evidence</div>
+            <p className="text-slate-400 leading-relaxed text-[11px]">
+              Cross-checks timeline, jurisdiction, missing context, and potential misrepresentations.
             </p>
           </div>
-          <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-            <div className="font-bold text-blue-700">4. Transparent Dossier</div>
-            <p className="text-slate-600 mt-1">
-              Generates an analytical verdict with direct links to primary source documents.
+
+          <div className="space-y-1 border-l sm:border-l-0 sm:border-t border-slate-700 pt-2 pl-3 sm:pl-0">
+            <span className="font-mono text-[10px] text-blue-400 font-bold">04 / AUDIT TRAIL</span>
+            <div className="font-bold text-slate-100">Transparent Report</div>
+            <p className="text-slate-400 leading-relaxed text-[11px]">
+              Produces an analytical verdict with direct links to primary source documents.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Main Claim Submission Form */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-5">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
-          {/* Mode Switcher */}
-          <div className="flex items-center gap-2">
+      {/* Main Investigation Workspace Console */}
+      <div className="bg-white rounded-xl border border-slate-200 p-6 md:p-8 space-y-6">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 flex-wrap gap-3">
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-lg">
             <button
               type="button"
               onClick={() => setInputMode('claim')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
                 inputMode === 'claim'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
@@ -174,10 +179,10 @@ export const InvestigatePage: React.FC = () => {
             <button
               type="button"
               onClick={() => setInputMode('transcript')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
                 inputMode === 'transcript'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Radio className="w-3.5 h-3.5" />
@@ -186,10 +191,10 @@ export const InvestigatePage: React.FC = () => {
             <button
               type="button"
               onClick={() => setInputMode('url')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
                 inputMode === 'url'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Globe className="w-3.5 h-3.5" />
@@ -197,21 +202,20 @@ export const InvestigatePage: React.FC = () => {
             </button>
           </div>
 
-          {/* Engine indicator */}
           <div className="flex items-center gap-1.5 text-xs text-slate-500">
             <Cpu className="w-3.5 h-3.5 text-slate-400" />
             <span>
               Engine:{' '}
-              <strong className="text-slate-800">
-                {ollamaConfig.enabled && ollamaStatus?.available ? 'Local Ollama + Primary Records' : 'Deterministic Grounded Pipeline'}
+              <strong className="text-slate-900 font-semibold">
+                {ollamaConfig.enabled && ollamaStatus?.available ? 'Local Ollama + Primary Records' : 'Deterministic Grounded Engine'}
               </strong>
             </span>
           </div>
         </div>
 
-        {/* URL Ingestion Input (if URL mode selected) */}
+        {/* URL Ingestion Section */}
         {inputMode === 'url' && (
-          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/90 space-y-3">
             <label className="block text-xs font-semibold text-slate-700">
               Enter Public News or Government Article URL:
             </label>
@@ -227,28 +231,28 @@ export const InvestigatePage: React.FC = () => {
                 type="button"
                 onClick={handleFetchUrl}
                 disabled={isScrapingUrl}
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xs font-semibold rounded-lg transition-colors shrink-0"
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xs font-semibold rounded-lg transition-colors shrink-0 cursor-pointer"
               >
                 {isScrapingUrl ? 'Retrieving Text...' : 'Retrieve Article Text'}
               </button>
             </div>
             {scrapeError && (
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded text-xs flex items-start gap-2">
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-lg text-xs flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <span>{scrapeError}</span>
               </div>
             )}
             <p className="text-[11px] text-slate-500">
-              Protected by SSRF security guardrails. Many sites disallow automated access; if blocked, simply paste the relevant quotation in the box below.
+              Protected by SSRF security guardrails. Many websites block automated access; if blocked, paste the text directly below.
             </p>
           </div>
         )}
 
-        {/* Claim / Transcript Submission Form */}
+        {/* Submission Form */}
         <form onSubmit={handleRunInvestigation} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-800 uppercase tracking-wider mb-1.5">
-              {inputMode === 'transcript' ? 'Paste Political Ad Transcript' : 'Political Claim or Quotation to Investigate'} *
+            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
+              {inputMode === 'transcript' ? 'Political Ad Transcript' : 'Political Claim or Statement to Investigate'} *
             </label>
             <textarea
               rows={4}
@@ -260,7 +264,7 @@ export const InvestigatePage: React.FC = () => {
                   ? 'Paste complete transcript of a TV or digital political advertisement (e.g. "Candidate X voted to raise your property taxes in the last session...")...'
                   : 'Enter the exact assertion or quote (e.g. "Texas enacted an $18 billion property tax cut in 2023")...'
               }
-              className="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600 leading-relaxed font-sans placeholder:text-slate-400"
+              className="w-full p-3.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-600 leading-relaxed font-sans placeholder:text-slate-400"
             />
           </div>
 
@@ -291,21 +295,21 @@ export const InvestigatePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-2 flex items-center justify-between flex-wrap gap-3">
+          <div className="pt-3 flex items-center justify-between flex-wrap gap-3 border-t border-slate-100">
             <div className="text-xs text-slate-500 flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Every factual assertion tested against primary Texas legislative journals.</span>
+              <span>Tested against original Texas and Federal statutory records.</span>
             </div>
 
             <button
               type="submit"
               disabled={isInvestigating || !claimText.trim()}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-400 text-white font-semibold rounded-lg text-sm transition-colors flex items-center gap-2 shadow-xs"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-400 text-white font-semibold rounded-xl text-sm transition-colors flex items-center gap-2 cursor-pointer"
             >
               {isInvestigating ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Evaluating Primary Evidence...</span>
+                  <span>Evaluating Primary Records...</span>
                 </>
               ) : (
                 <>
@@ -318,20 +322,19 @@ export const InvestigatePage: React.FC = () => {
         </form>
       </div>
 
-      {/* Research Library Section */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* Curated Research Catalog */}
+      <section className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-slate-200 pb-3">
           <div>
-            <h2 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+            <h2 className="text-xl font-serif font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-blue-700" />
               <span>Curated Research Claims Library ({filteredLibraryClaims.length})</span>
             </h2>
-            <p className="text-xs md:text-sm text-slate-500">
-              Explore previously researched Texas political claims with full evidential dossiers and statutory citations.
+            <p className="text-xs text-slate-500 mt-0.5">
+              Researched Texas political claims with complete evidential dossiers and statutory citations.
             </p>
           </div>
 
-          {/* Topic Filter */}
           <div className="flex items-center gap-2">
             <label className="text-xs text-slate-500 font-medium shrink-0">Filter Topic:</label>
             <select
@@ -348,16 +351,15 @@ export const InvestigatePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Claims Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredLibraryClaims.map((claim) => (
             <Link
               key={claim.id}
               to={`/investigate/${claim.id}`}
-              className="bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 hover:shadow-xs transition-all flex flex-col justify-between group"
+              className="bg-white rounded-xl p-5 border border-slate-200/90 hover:border-slate-300 transition-colors flex flex-col justify-between group"
             >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-2.5">
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                     {claim.topic}
                   </span>
@@ -368,11 +370,11 @@ export const InvestigatePage: React.FC = () => {
                   "{claim.claimText}"
                 </h3>
 
-                <p className="text-slate-600 text-xs mt-2.5 line-clamp-2 leading-relaxed">
+                <p className="text-slate-600 text-xs line-clamp-2 leading-relaxed">
                   {claim.assessment.shortExplanation}
                 </p>
 
-                <div className="mt-3 flex flex-wrap gap-1">
+                <div className="mt-2 flex flex-wrap gap-1">
                   {claim.tags.map((tag) => (
                     <span
                       key={tag}
@@ -386,15 +388,15 @@ export const InvestigatePage: React.FC = () => {
 
               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span className="truncate max-w-[220px]">Speaker: {claim.speakerOrSource}</span>
-                <span className="text-blue-600 font-semibold group-hover:underline flex items-center gap-1">
-                  <span>Full Report</span>
+                <span className="text-blue-700 font-semibold group-hover:underline flex items-center gap-1">
+                  <span>Full Dossier</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </div>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
 
       <NonpartisanDisclaimer />
     </div>

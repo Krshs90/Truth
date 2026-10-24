@@ -47,10 +47,10 @@ describe('UI Functional Integration Tests', () => {
   it('Renders Investigate workspace with 4-step pipeline', () => {
     renderWithProviders(<InvestigatePage />);
     expect(screen.getByText('Investigate Political Claims')).toBeInTheDocument();
-    expect(screen.getByText('1. Extract Claims')).toBeInTheDocument();
-    expect(screen.getByText('2. Retrieve Evidence')).toBeInTheDocument();
-    expect(screen.getByText('3. Evaluate Evidence')).toBeInTheDocument();
-    expect(screen.getByText('4. Transparent Dossier')).toBeInTheDocument();
+    expect(screen.getByText('Extract Claims')).toBeInTheDocument();
+    expect(screen.getByText('Retrieve Evidence')).toBeInTheDocument();
+    expect(screen.getByText('Evaluate Evidence')).toBeInTheDocument();
+    expect(screen.getByText('Transparent Report')).toBeInTheDocument();
   });
 
   it('Renders Candidate Comparison matrix with issue dropdowns', () => {

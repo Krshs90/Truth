@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Building2,
   Search,
   ExternalLink,
   Scale,
@@ -47,11 +46,7 @@ export const GovernmentPage: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Header */}
       <div>
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-800 text-xs rounded-full font-medium mb-2">
-          <Building2 className="w-3.5 h-3.5 text-blue-600" />
-          <span>TEXAS & FEDERAL LEGISLATIVE TRACKER</span>
-        </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+        <h1 className="text-2xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight">
           Government & Legislative Tracker
         </h1>
         <p className="text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Users,
   ExternalLink,
   Filter,
 } from 'lucide-react';
@@ -32,11 +31,7 @@ export const ComparePage: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Header */}
       <div>
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-800 text-xs rounded-full font-medium mb-2">
-          <Users className="w-3.5 h-3.5 text-blue-600" />
-          <span>SIDE-BY-SIDE CANDIDATE ANALYSIS</span>
-        </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+        <h1 className="text-2xl md:text-4xl font-serif font-bold text-slate-900 tracking-tight">
           Compare Candidates on Documented Issues
         </h1>
         <p className="text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">

@@ -2,10 +2,10 @@
 
 @layer base {
   :root {
-    --navy-950: #070d1e;
+    --navy-950: #050b18;
     --navy-900: #0b132b;
+    --navy-850: #121c38;
     --navy-800: #1c2541;
-    --navy-700: #263554;
     --slate-50: #f8fafc;
     --slate-100: #f1f5f9;
     --slate-200: #e2e8f0;
@@ -18,7 +18,6 @@
     --slate-900: #0f172a;
     --civic-blue: #1d4ed8;
     --civic-blue-hover: #1e40af;
-    --civic-blue-light: #eff6ff;
   }
 
   body {
@@ -27,10 +26,23 @@
     background-color: #f8fafc;
     color: #0f172a;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Bespoke text selection */
+  ::selection {
+    background-color: #1e3a8a;
+    color: #ffffff;
+  }
+
+  /* Numerical data uses tabular numbers */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Custom scrollbars for research panels */
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -47,4 +59,16 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* Print styling for claim dossiers */
+@media print {
+  aside, header, nav, button {
+    display: none !important;
+  }
+  body, main {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+  }
 }
