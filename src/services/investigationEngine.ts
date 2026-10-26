@@ -21,10 +21,6 @@ export interface InvestigationResult {
   };
 }
 
-/**
- * Stage 1: Extract individual assertions from user input text.
- * Distinguishes factual assertions, predictions, opinions, and value judgments.
- */
 export function extractAssertions(inputText: string): {
   assertions: { text: string; type: AssertionType; rationale: string }[];
 } {
@@ -43,7 +39,6 @@ export function extractAssertions(inputText: string): {
   for (const sentence of sentences) {
     const lower = sentence.toLowerCase();
 
-    // Check for future predictions
     if (
       lower.includes('will destroy') ||
       lower.includes('will bankrupt') ||
@@ -59,7 +54,6 @@ export function extractAssertions(inputText: string): {
         rationale: 'Speculates on future hypothetical outcomes rather than verifiable historical actions.',
       });
     }
-    // Check for subjective value judgments / rhetoric
     else if (
       lower.includes('corrupt') ||
       lower.includes('worst') ||
@@ -77,7 +71,6 @@ export function extractAssertions(inputText: string): {
         rationale: 'Expresses rhetorical appraisal or normative judgment rather than an empirical proposition.',
       });
     }
-    // Check for stated beliefs / candidate intent
     else if (
       lower.includes('wants to') ||
       lower.includes('believes that') ||
@@ -91,7 +84,6 @@ export function extractAssertions(inputText: string): {
         rationale: 'Characterizes legislative philosophy or intent rather than a documented statutory roll call.',
       });
     }
-    // Default to verifiable factual assertion
     else {
       assertions.push({
         text: sentence,
@@ -104,9 +96,6 @@ export function extractAssertions(inputText: string): {
   return { assertions };
 }
 
-/**
- * Stage 2: Retrieve relevant primary evidence from indexed repository.
- */
 export function retrieveEvidenceForQuery(query: string): {
   primarySources: SourceItem[];
   matchingEvidence: EvidenceItem[];
@@ -114,7 +103,6 @@ export function retrieveEvidenceForQuery(query: string): {
 } {
   const qLower = query.toLowerCase();
 
-  // 1. Check for close pre-researched claim match
   const exactMatch = CLAIMS.find((c) => {
     const claimLower = c.claimText.toLowerCase();
     const words = qLower.split(/\s+/).filter((w) => w.length > 3);
@@ -133,7 +121,6 @@ export function retrieveEvidenceForQuery(query: string): {
     };
   }
 
-  // 2. Scan bills for direct matches or thematic alignment
   const matchedBills = BILLS.filter((b) => {
     const numLower = b.officialBillNumber.toLowerCase();
     const titleLower = b.title.toLowerCase();
@@ -213,10 +200,9 @@ export function retrieveEvidenceForQuery(query: string): {
     }
   }
 
-  // 3. Scan officials for name match and include their official profile and recent votes
   const matchedOfficials = OFFICIALS.filter((o) => {
-    const lastName = o.name.split(' ').pop()?.toLowerCase() || '';
-    return qLower.includes(o.name.toLowerCase()) || (lastName.length > 3 && qLower.includes(lastName));
+    const parts = o.name.toLowerCase().split(/\s+/);
+    return qLower.includes(o.name.toLowerCase()) || parts.some((p) => p.length >= 3 && qLower.includes(p));
   });
 
   for (const off of matchedOfficials) {
@@ -249,7 +235,6 @@ export function retrieveEvidenceForQuery(query: string): {
     }
   }
 
-  // 4. Always provide live official portal links if no direct matches
   if (primarySources.length === 0) {
     const encodedQ = encodeURIComponent(query.slice(0, 80));
     primarySources.push(
@@ -281,14 +266,25 @@ export function retrieveEvidenceForQuery(query: string): {
   return { primarySources, matchingEvidence };
 }
 
+const CIVIC_STOPWORDS = new Set([
+  'texas', 'state', 'public', 'house', 'senate', 'legislature', 'passed', 'voted', 'bill',
+  'about', 'after', 'other', 'their', 'which', 'under', 'would', 'could', 'first', 'every',
+  'during', 'session', 'office', 'official', 'record', 'government', 'records', 'report',
+  'candidate', 'candidates', 'election', 'elections', 'midterm', 'midterms', 'results',
+]);
+
 function wordsOverlap(a: string, b: string): boolean {
-  const wordsA = a.split(/\s+/).filter((w) => w.length > 4);
-  return wordsA.some((w) => b.includes(w));
+  const wordsA = a
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .split(/\s+/)
+    .filter((w) => w.length > 4 && !CIVIC_STOPWORDS.has(w));
+
+  const lowerB = b.toLowerCase();
+  const matches = wordsA.filter((w) => lowerB.includes(w));
+  return matches.length >= 2;
 }
 
-/**
- * Stage 3 & 4: Evaluate Evidence and Produce Transparent Report
- */
 export async function investigateClaim(
   inputText: string,
   options?: {
@@ -302,7 +298,59 @@ export async function investigateClaim(
   const { assertions } = extractAssertions(inputText);
   const retrieval = retrieveEvidenceForQuery(inputText);
 
-  // If there is an exact verified match in our research library, return it directly
+  const isVotingQuery = /who.*(should|ought|to).*vote|who.*(do|would).*i.*vote|who.*is.*(better|best).*(candidate|paxton|talarico|cruz|allred)|which.*candidate.*(should|better|to vote)|tell.*me.*who.*to.*vote/i.test(inputText);
+  if (isVotingQuery) {
+    const claimId = `voting-guidance-${Date.now()}`;
+    return {
+      claim: {
+        id: claimId,
+        claimText: inputText,
+        submittedContent: inputText,
+        speakerOrSource: 'Voter Decision Inquiry',
+        contextOrEvent: '2026 Texas Elections Inquiry',
+        topic: 'Elections & Voting Rights',
+        submissionDate: new Date().toISOString().split('T')[0],
+        isDemo: false,
+        investigationStatus: 'complete',
+        tags: ['Voter Decision', 'Elections 2026', 'Nonpartisan Comparison'],
+        assessment: {
+          id: `assess-${Date.now()}`,
+          claimId,
+          verdict: 'Opinion or prediction, not directly fact-checkable',
+          shortExplanation: 'As an independent nonpartisan civic platform, Truth does not endorse candidates or recommend how citizens should vote. Compare documented roll-call votes, certified campaign finance filings, and candidate platforms directly.',
+          keyAssertions: [
+            {
+              id: 'asrt-vote-1',
+              assertionText: 'Voter choice and candidate endorsement',
+              assertionType: 'value_judgment',
+              status: 'not_applicable',
+              explanation: 'Candidate selection is an individual democratic choice that cannot be answered with an empirical fact rating. Truth provides verified public records so voters can make an informed choice.',
+              evidenceIds: [],
+            },
+          ],
+          supportingEvidence: [],
+          contradictingOrQualifyingEvidence: [],
+          missingContext: [
+            'Voters should review certified Texas Ethics Commission campaign contribution disclosures and Texas Legislature Online roll-call journals for each candidate.'
+          ],
+          remainingUncertainty: [],
+          primarySources: retrieval.primarySources.slice(0, 3),
+          factChecksAndReporting: [],
+          methodologyAndLimitations: 'Evaluated under Truth Nonpartisan Evidential Standards. Endorsements and candidate preferences are strictly excluded.',
+          lastAssessedAt: new Date().toISOString().split('T')[0],
+          methodologyVersion: 'Truth-v1.3',
+          assessedBy: 'deterministic_engine',
+        },
+      },
+      isAiEnhanced: false,
+      retrievalSummary: {
+        sourcesScanned: 50,
+        primaryEvidenceFound: 0,
+        corroboratingReportsFound: retrieval.primarySources.length,
+      },
+    };
+  }
+
   if (retrieval.exactMatchClaim) {
     return {
       claim: retrieval.exactMatchClaim,
@@ -315,7 +363,6 @@ export async function investigateClaim(
     };
   }
 
-  // Otherwise, construct a grounded assessment from retrieved evidence
   const evaluatedAssertions: AssertionEvaluation[] = assertions.map((a, idx) => {
     if (a.type === 'prediction' || a.type === 'value_judgment') {
       return {
@@ -328,7 +375,6 @@ export async function investigateClaim(
       };
     }
 
-    // Check if evidence exists in matchingEvidence
     const matchingEv = retrieval.matchingEvidence.filter((ev) =>
       ev.excerpt.toLowerCase().includes(a.text.toLowerCase().substring(0, 15)) ||
       wordsOverlap(a.text.toLowerCase(), ev.excerpt.toLowerCase())
@@ -355,7 +401,6 @@ export async function investigateClaim(
     };
   });
 
-  // Determine analytical Verdict strictly by evidential rubric
   let verdict: ClaimVerdict = 'Unverified';
   let shortExplanation = 'Primary records require independent verification against Texas Legislature Online and Congressional journals.';
 
@@ -379,29 +424,53 @@ export async function investigateClaim(
     }
   }
 
-  // Check if Ollama AI enhancement is requested and available
   let isAiEnhanced = false;
-  if (options?.useOllama && retrieval.matchingEvidence.length > 0) {
+  if (options?.useOllama) {
     try {
-      const aiResponse = await fetch('/api/ai/investigate', {
+      const aiResponse = await fetch('/api/ai/verify-claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           claimText: inputText,
-          retrievedEvidence: retrieval.matchingEvidence,
-          model: options.ollamaModel || 'llama3',
+          speakerOrSource: options.speakerOrSource || 'Research Query',
         }),
       });
 
       if (aiResponse.ok) {
         const aiData = await aiResponse.json();
-        if (aiData?.explanation) {
-          shortExplanation = aiData.explanation;
+        if (aiData?.shortExplanation || aiData?.explanation) {
+          shortExplanation = aiData.shortExplanation || aiData.explanation;
           isAiEnhanced = true;
+        }
+        if (aiData?.verdict) {
+          verdict = aiData.verdict as ClaimVerdict;
         }
       }
     } catch {
       isAiEnhanced = false;
+    }
+  }
+
+  const lowerExp = shortExplanation.toLowerCase();
+  const textIndicatesUnsupported =
+    lowerExp.includes('not supported') ||
+    lowerExp.includes('does not support') ||
+    lowerExp.includes('unsupported') ||
+    lowerExp.includes('none of the records mention') ||
+    lowerExp.includes('no records mention') ||
+    lowerExp.includes('cannot be verified') ||
+    lowerExp.includes('lacks evidence') ||
+    lowerExp.includes('no evidence') ||
+    lowerExp.includes('suggesting that the claim is not supported') ||
+    lowerExp.includes('unverified');
+
+  if (textIndicatesUnsupported) {
+    verdict = 'Unverified';
+    for (const ea of evaluatedAssertions) {
+      if (ea.status === 'supported') {
+        ea.status = 'unverified';
+        ea.explanation = 'No specific statutory enactment or roll-call vote in official journals corroborates this assertion.';
+      }
     }
   }
 

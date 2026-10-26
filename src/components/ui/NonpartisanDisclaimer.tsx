@@ -17,7 +17,7 @@ export const NonpartisanDisclaimer: React.FC<{ compact?: boolean }> = ({ compact
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
           <span className="text-slate-300">Nonpartisan civic research • All claims anchored in official government records</span>
         </span>
-        <Link to="/sources" className="text-blue-400 hover:text-blue-300 font-medium ml-2">
+        <Link to="/sources" className="text-amber-400 hover:text-amber-300 font-medium ml-2">
           Methodology
         </Link>
       </div>

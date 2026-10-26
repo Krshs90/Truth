@@ -1,6 +1,6 @@
 import React from 'react';
 import { ClaimVerdict } from '../../types';
-import { CheckCircle2, AlertTriangle, XCircle, Info, FileQuestion } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, XCircle, Info, Clock } from 'lucide-react';
 
 interface VerdictBadgeProps {
   verdict: ClaimVerdict;
@@ -51,12 +51,19 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
           dot: 'bg-indigo-400',
           icon: Info,
         };
-      case 'Unverified':
-      default:
+      case 'Unchecked':
         return {
-          bg: 'bg-[#222222] border-[#31312F] text-slate-300 shadow-xs',
-          dot: 'bg-slate-400',
-          icon: FileQuestion,
+          bg: 'bg-[#222221] border-[#383836] text-stone-300 shadow-xs',
+          dot: 'bg-stone-400',
+          icon: Clock,
+          label: 'Unchecked',
+        };
+      case 'Unverified':
+        return {
+          bg: 'bg-[#222221] border-[#383836] text-stone-300 shadow-xs',
+          dot: 'bg-stone-400',
+          icon: Clock,
+          label: 'Unverified',
         };
     }
   };
@@ -73,7 +80,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
   return (
     <span
       className={`inline-flex items-center rounded-full border ${style.bg} ${sizeClasses[size]} transition-all`}
-      title={`Analytical Verdict: ${verdict}`}
+      title={`Analytical Verdict: ${style.label || verdict}`}
     >
       {showIcon && (
         <IconComponent
@@ -82,7 +89,7 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
           }`}
         />
       )}
-      <span>{verdict}</span>
+      <span>{style.label || verdict}</span>
     </span>
   );
 };

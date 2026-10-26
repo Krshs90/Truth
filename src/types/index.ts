@@ -19,6 +19,7 @@ export type ClaimVerdict =
   | 'Mostly unsupported'
   | 'Contradicted by available evidence'
   | 'Unverified'
+  | 'Unchecked'
   | 'Opinion or prediction, not directly fact-checkable';
 
 export type SourceType =
@@ -134,13 +135,39 @@ export interface RollCallVote {
   officialJournalUrl: string;
 }
 
+export interface DynamicCampaignUpdate {
+  id: string;
+  raceId: string;
+  candidateName: string;
+  headline: string;
+  publisher: string;
+  sourceUrl: string;
+  publicationDate: string;
+  summary: string;
+  impactOnStandings?: string;
+}
+
+export interface DynamicLegislativeBill {
+  id: string;
+  billNumber: string;
+  title: string;
+  session: string;
+  chamber: 'Texas House' | 'Texas Senate' | 'U.S. Congress';
+  author: string;
+  status: string;
+  topic: string;
+  summary: string;
+  journalUrl?: string;
+  retrievedAt: string;
+}
+
 export interface Bill {
   id: string;
-  officialBillNumber: string; // e.g., "TX 88(R) SB 2"
+  officialBillNumber: string;
   title: string;
   caption: string;
   chamber: Chamber;
-  session: string; // e.g., "88th Regular Session (2023)"
+  session: string;
   status: LegislativeStatus;
   statusDate: string;
   author: string;
@@ -159,9 +186,10 @@ export interface Official {
   id: string;
   name: string;
   office: string;
-  jurisdiction: 'Federal' | 'Texas Senate' | 'Texas House' | 'Texas Executive' | 'Local';
+  jurisdiction: 'Federal' | 'Texas Senate' | 'Texas House' | 'Texas Executive' | 'Texas Judicial' | 'Local';
   district: string;
-  party: string; // Note: Neutral badge display in UI
+  party: string;
+  photoUrl?: string;
   officialWebsite: string;
   officialProfileUrl: string;
   officeAddress?: string;
@@ -187,7 +215,7 @@ export interface Official {
 export interface PolicyPosition {
   id: string;
   candidateId: string;
-  issue: string; // e.g., "Education & School Vouchers", "Property Taxes", "Border & Public Safety"
+  issue: string;
   positionSummary: string;
   documentedStance: string;
   directQuotes?: string[];
@@ -203,9 +231,10 @@ export interface Candidate {
   id: string;
   name: string;
   officeSought: string;
-  jurisdiction: 'Federal' | 'Texas Senate' | 'Texas House' | 'Texas Executive';
+  jurisdiction: 'Federal' | 'Texas Senate' | 'Texas House' | 'Texas Executive' | 'Texas Judicial';
   district: string;
   party: string;
+  photoUrl?: string;
   campaignUrl: string;
   isIncumbent: boolean;
   electionId: string;
@@ -214,6 +243,55 @@ export interface Candidate {
   bioSummary: string;
   policyPositions: PolicyPosition[];
   lastVerifiedAt: string;
+  campaignFinance?: {
+    cashOnHand?: string;
+    totalRaised?: string;
+    source: string;
+  };
+  pollingSnapshot?: {
+    estimate: string;
+    trend: string;
+    source: string;
+  };
+  careerHistory?: {
+    education?: string;
+    pastOffices?: string[];
+    majorMilestones?: string[];
+    ethicsAndLegalRecord?: string[];
+    topDonorsAndPacs?: Array<{ name: string; amount: string; type: string }>;
+  };
+  attackAdsAndPropaganda?: Array<{
+    id: string;
+    sloganOrClaim: string;
+    targetOrTopic: string;
+    sponsoringPac: string;
+    adMedium: string;
+    claimedAssertion: string;
+    realityCheck: string;
+    verifiableSourceUrl: string;
+    sourceTitle: string;
+    adTitle?: string;
+    videoUrl?: string;
+    videoEmbedId?: string;
+    airDates?: string;
+    fccFileNumber?: string;
+    isAutonomousDetection?: boolean;
+  }>;
+}
+
+export interface CampaignRace {
+  id: string;
+  name: string;
+  cycle: string;
+  status: string;
+  candidateAId: string;
+  candidateBId: string;
+  pollingSummary: string;
+  financeSummary: string;
+  keyIssues: string[];
+  primaryElectionDate?: string;
+  primaryRunoffDate?: string;
+  generalElectionDate?: string;
 }
 
 export interface TexasDistrict {

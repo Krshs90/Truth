@@ -27,6 +27,18 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 5173,
     strictPort: true,
+    watch: {
+      ignored: [
+        '**/server/**',
+        '**/scripts/**',
+        '**/tests/**',
+        '**/test-results/**',
+        '**/public/**',
+        '**/*.json',
+        '**/.system_generated/**',
+        '**/scratch/**',
+      ],
+    },
   },
   resolve: {
     alias: {
@@ -37,5 +49,6 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
 })

@@ -1,7 +1,6 @@
 import { TexasDistrict } from '../types';
 
 export const TEXAS_DISTRICTS: TexasDistrict[] = [
-  // ==================== U.S. CONGRESSIONAL DISTRICTS (Texas has 38) ====================
   {
     id: 'tx-cd-37',
     type: 'congressional',
@@ -45,6 +44,17 @@ export const TEXAS_DISTRICTS: TexasDistrict[] = [
     description: 'Runs along the Interstate 35 corridor, connecting southeast Austin and Del Valle through Lockhart, Kyle, Buda, and San Marcos into downtown and South San Antonio.',
     currentOfficialId: 'off-fed-casar',
     verifiedZipCodes: ['78741', '78744', '78745', '78747', '78610', '78640', '78644', '78207', '78210', '78215', '78225'],
+  },
+  {
+    id: 'tx-cd-26',
+    type: 'congressional',
+    districtNumber: '26',
+    name: 'Texas Congressional District 26',
+    region: 'North Texas (Denton, Cooke, Wise Counties / DFW North)',
+    majorCounties: ['Denton County', 'Cooke County', 'Wise County'],
+    description: 'Encompasses Denton, Flower Mound, Lewisville, Gainesville, Decatur, and suburban communities across Denton, Cooke, and Wise counties.',
+    currentOfficialId: 'off-fed-gill',
+    verifiedZipCodes: ['76201', '76205', '76207', '76208', '76209', '76210', '76226', '76227', '75022', '75028', '75067', '75077', '76234', '76240', '76262', '76247'],
   },
   {
     id: 'tx-cd-32',
@@ -135,7 +145,6 @@ export const TEXAS_DISTRICTS: TexasDistrict[] = [
     verifiedZipCodes: ['78040', '78041', '78043', '78045', '78064', '78572', '78576', '78582'],
   },
 
-  // ==================== TEXAS STATE SENATE DISTRICTS (Texas has 31) ====================
   {
     id: 'tx-sd-14',
     type: 'state_senate',
@@ -224,8 +233,18 @@ export const TEXAS_DISTRICTS: TexasDistrict[] = [
     currentOfficialId: 'off-txsen-schwertner',
     verifiedZipCodes: ['78613', '78626', '78628', '78633', '78641', '78664', '78665', '78681', '77840', '77845'],
   },
+  {
+    id: 'tx-sd-12',
+    type: 'state_senate',
+    districtNumber: '12',
+    name: 'Texas Senate District 12',
+    region: 'North Texas (Denton, Tarrant & Wise Counties)',
+    majorCounties: ['Denton County', 'Tarrant County', 'Wise County'],
+    description: 'Encompasses Denton, Flower Mound, Highland Village, Carrollton, Lewisville, and northern suburban DFW communities across Denton and Wise counties.',
+    currentOfficialId: 'off-txsen-parker',
+    verifiedZipCodes: ['76201', '76205', '76207', '76208', '76209', '76210', '76226', '75022', '75028', '75067', '75077', '76234', '76240'],
+  },
 
-  // ==================== TEXAS STATE HOUSE DISTRICTS (Key representative areas) ====================
   {
     id: 'tx-hd-49',
     type: 'state_house',
@@ -336,19 +355,107 @@ export const TEXAS_DISTRICTS: TexasDistrict[] = [
     currentOfficialId: 'off-txrep-romero',
     verifiedZipCodes: ['76102', '76104', '76106', '76110', '76111', '76114', '76164'],
   },
+  {
+    id: 'tx-hd-64',
+    type: 'state_house',
+    districtNumber: '64',
+    name: 'Texas House District 64',
+    region: 'North Texas / Denton County (City of Denton, Krum, Sanger)',
+    majorCounties: ['Denton County'],
+    description: 'Covers the central and northern Denton County region including the City of Denton, University of North Texas, Texas Woman\'s University, Krum, and Sanger.',
+    currentOfficialId: 'off-txrep-hopper',
+    verifiedZipCodes: ['76201', '76205', '76207', '76208', '76209', '76210', '76226', '76249', '76266'],
+  },
 ];
 
-// Helper to look up likely districts by Texas ZIP code
+export function getStateFromZip(zip: string): string {
+  const clean = zip.trim();
+  const p2 = parseInt(clean.slice(0, 2), 10);
+  const p3 = parseInt(clean.slice(0, 3), 10);
+
+  if ((p2 >= 75 && p2 <= 79) || clean === '73301') return 'Texas';
+
+  if (p3 >= 10 && p3 <= 27) return 'Massachusetts';
+  if (p3 >= 28 && p3 <= 29) return 'Rhode Island';
+  if (p3 >= 30 && p3 <= 38) return 'New Hampshire';
+  if (p3 >= 39 && p3 <= 49) return 'Maine';
+  if (p3 >= 50 && p3 <= 59) return 'Vermont';
+  if (p3 >= 60 && p3 <= 69) return 'Connecticut';
+  if (p3 >= 70 && p3 <= 89) return 'New Jersey';
+  if (p3 >= 100 && p3 <= 149) return 'New York';
+  if (p3 >= 150 && p3 <= 196) return 'Pennsylvania';
+  if (p3 >= 197 && p3 <= 199) return 'Delaware';
+  if (p3 >= 200 && p3 <= 205) return 'Washington, D.C.';
+  if (p3 >= 206 && p3 <= 219) return 'Maryland';
+  if (p3 >= 220 && p3 <= 246) return 'Virginia';
+  if (p3 >= 247 && p3 <= 268) return 'West Virginia';
+  if (p3 >= 270 && p3 <= 289) return 'North Carolina';
+  if (p3 >= 290 && p3 <= 299) return 'South Carolina';
+  if (p3 >= 300 && p3 <= 319) return 'Georgia';
+  if (p3 >= 320 && p3 <= 349) return 'Florida';
+  if (p3 >= 350 && p3 <= 369) return 'Alabama';
+  if (p3 >= 370 && p3 <= 385) return 'Tennessee';
+  if (p3 >= 386 && p3 <= 397) return 'Mississippi';
+  if (p3 >= 400 && p3 <= 427) return 'Kentucky';
+  if (p3 >= 430 && p3 <= 459) return 'Ohio';
+  if (p3 >= 460 && p3 <= 479) return 'Indiana';
+  if (p3 >= 480 && p3 <= 499) return 'Michigan';
+  if (p3 >= 500 && p3 <= 528) return 'Iowa';
+  if (p3 >= 530 && p3 <= 549) return 'Wisconsin';
+  if (p3 >= 550 && p3 <= 567) return 'Minnesota';
+  if (p3 >= 570 && p3 <= 577) return 'South Dakota';
+  if (p3 >= 580 && p3 <= 588) return 'North Dakota';
+  if (p3 >= 590 && p3 <= 599) return 'Montana';
+  if (p3 >= 600 && p3 <= 629) return 'Illinois';
+  if (p3 >= 630 && p3 <= 658) return 'Missouri';
+  if (p3 >= 660 && p3 <= 679) return 'Kansas';
+  if (p3 >= 680 && p3 <= 693) return 'Nebraska';
+  if (p3 >= 700 && p3 <= 715) return 'Louisiana';
+  if (p3 >= 716 && p3 <= 729) return 'Arkansas';
+  if (p3 >= 730 && p3 <= 749) return 'Oklahoma';
+  if (p3 >= 800 && p3 <= 816) return 'Colorado';
+  if (p3 >= 820 && p3 <= 831) return 'Wyoming';
+  if (p3 >= 832 && p3 <= 839) return 'Idaho';
+  if (p3 >= 840 && p3 <= 847) return 'Utah';
+  if (p3 >= 850 && p3 <= 865) return 'Arizona';
+  if (p3 >= 870 && p3 <= 884) return 'New Mexico';
+  if (p3 >= 889 && p3 <= 898) return 'Nevada';
+  if (p3 >= 900 && p3 <= 961) return 'California';
+  if (p3 >= 967 && p3 <= 969) return 'Hawaii / Pacific';
+  if (p3 >= 970 && p3 <= 979) return 'Oregon';
+  if (p3 >= 980 && p3 <= 994) return 'Washington';
+  if (p3 >= 995 && p3 <= 999) return 'Alaska';
+
+  return 'Out-of-State';
+}
+
 export function findDistrictsByZip(zip: string): {
   congressional?: TexasDistrict;
   stateSenate?: TexasDistrict;
   stateHouse?: TexasDistrict;
   notes: string;
   matchedCounties: string[];
+  isTexas?: boolean;
+  stateName?: string;
 } {
   const cleanZip = zip.trim();
+  const detectedState = getStateFromZip(cleanZip);
 
-  // Direct match from verified lists
+  if (detectedState !== 'Texas') {
+    const cdDefault = TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-37')!;
+    const sdDefault = TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-14')!;
+    const hdDefault = TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-49')!;
+    return {
+      congressional: cdDefault,
+      stateSenate: sdDefault,
+      stateHouse: hdDefault,
+      matchedCounties: ['Travis County'],
+      isTexas: false,
+      stateName: detectedState,
+      notes: `Non-Texas ZIP detected (${cleanZip} is located in ${detectedState}). Truth is a Texas-first civic intelligence system (Texas ZIPs: 75000–79999). Defaulted to Texas Capitol delegation (Austin TX-37 / SD-14 / HD-49) for research.`,
+    };
+  }
+
   const cdDirect = TEXAS_DISTRICTS.find(
     (d) => d.type === 'congressional' && d.verifiedZipCodes.includes(cleanZip)
   );
@@ -369,7 +476,6 @@ export function findDistrictsByZip(zip: string): {
     };
   }
 
-  // Broad Texas ZIP prefix heuristic mapping for entire state of Texas
   const prefix2 = cleanZip.slice(0, 2);
   const prefix3 = cleanZip.slice(0, 3);
 
@@ -379,70 +485,126 @@ export function findDistrictsByZip(zip: string): {
   let regionName = 'Texas';
 
   if (!cdFallback || !sdFallback || !hdFallback) {
-    // 787xx, 786xx -> Austin / Central TX
     if (prefix3 === '787' || prefix3 === '786') {
       cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-37');
       sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-14');
       hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-49');
-      regionName = 'Austin / Central Texas';
+      regionName = 'Austin Metro & Travis/Williamson';
     }
-    // 750xx - 753xx -> Dallas / North TX
-    else if (prefix3 >= '750' && prefix3 <= '753') {
+    else if (prefix3 >= '750' && prefix3 <= '754') {
       cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-32');
       sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-16');
       hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-108');
       regionName = 'Dallas Metroplex';
     }
-    // 760xx - 762xx -> Fort Worth / Tarrant County
-    else if (prefix3 >= '760' && prefix3 <= '762') {
+    else if (prefix3 >= '755' && prefix3 <= '759') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-10');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-16');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-21');
+      regionName = 'East Texas & Piney Woods';
+    }
+    else if (prefix3 === '762') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-26');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-12');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-64');
+      regionName = 'Denton & Cooke Counties (TX-26 - Brandon Gill)';
+    }
+    else if (prefix3 >= '760' && prefix3 <= '761') {
       cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-12');
       sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-16');
       hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-90');
       regionName = 'Fort Worth / Tarrant County';
     }
-    // 770xx - 775xx -> Houston / Gulf Coast
+    else if (prefix3 >= '763' && prefix3 <= '764') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-26');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-12');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-64');
+      regionName = 'Wichita Falls & North Central Texas';
+    }
+    else if (prefix3 >= '765' && prefix3 <= '767') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-10');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-14');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-49');
+      regionName = 'Central Texas (Waco & Temple)';
+    }
+    else if (prefix3 >= '768' && prefix3 <= '769') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-21');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-73');
+      regionName = 'Concho Valley & San Angelo';
+    }
     else if (prefix3 >= '770' && prefix3 <= '775') {
       cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-07');
       sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-15');
       hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-134');
       regionName = 'Houston Metro';
     }
-    // 780xx - 782xx -> San Antonio / South Texas
-    else if (prefix3 >= '780' && prefix3 <= '782') {
-      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-21');
-      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
-      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-73');
-      regionName = 'San Antonio / Bexar County';
-    }
-    // 798xx - 799xx -> El Paso / Far West Texas
-    else if (prefix3 === '798' || prefix3 === '799') {
-      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-16');
-      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-29');
-      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-77');
-      regionName = 'El Paso / West Texas';
-    }
-    // 793xx - 794xx -> Lubbock / South Plains
-    else if (prefix3 === '793' || prefix3 === '794') {
-      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-23');
-      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
-      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-83');
-      regionName = 'Lubbock / South Plains';
-    }
-    // 776xx - 777xx -> Southeast Texas / Beaumont
     else if (prefix3 === '776' || prefix3 === '777') {
       cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-02');
       sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-15');
       hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-21');
       regionName = 'Southeast Texas / Beaumont';
     }
-    // 785xx -> Rio Grande Valley
+    else if (prefix3 >= '778' && prefix3 <= '779') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-10');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-14');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-49');
+      regionName = 'Brazos Valley & Victoria';
+    }
+    else if (prefix3 >= '780' && prefix3 <= '782') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-21');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-73');
+      regionName = 'San Antonio / Bexar County';
+    }
+    else if (prefix3 === '783' || prefix3 === '784') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-35');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-73');
+      regionName = 'Coastal Bend & Corpus Christi';
+    }
     else if (prefix3 === '785') {
-      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-28');
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-35');
       sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
       hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-49');
       regionName = 'Rio Grande Valley';
     }
-    // General Texas fallback
+    else if (prefix3 >= '788' && prefix3 <= '789') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-21');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-73');
+      regionName = 'Southwest Texas & Central Plains';
+    }
+    else if (prefix3 >= '790' && prefix3 <= '792') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-26');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-12');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-64');
+      regionName = 'Texas Panhandle & Amarillo';
+    }
+    else if (prefix3 === '793' || prefix3 === '794') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-23');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-83');
+      regionName = 'South Plains & Lubbock';
+    }
+    else if (prefix3 === '795' || prefix3 === '796') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-26');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-12');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-64');
+      regionName = 'Big Country & Abilene';
+    }
+    else if (prefix3 === '797') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-23');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-25');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-83');
+      regionName = 'Permian Basin (Midland / Odessa)';
+    }
+    else if (prefix3 === '798' || prefix3 === '799') {
+      cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-16');
+      sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-29');
+      hdFallback = hdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-hd-77');
+      regionName = 'El Paso / Far West Texas';
+    }
     else if (prefix2 >= '75' && prefix2 <= '79') {
       cdFallback = cdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-cd-37');
       sdFallback = sdFallback || TEXAS_DISTRICTS.find((d) => d.id === 'tx-sd-14');
@@ -463,7 +625,7 @@ export function findDistrictsByZip(zip: string): {
     stateHouse: finalHd,
     matchedCounties: counties,
     notes: cleanZip.startsWith('7')
-      ? `Mapped to ${regionName} regional delegation for ZIP ${cleanZip}. Because Texas ZIP codes often cross legislative boundaries, verify your specific districts using the selectors below.`
+      ? `Mapped to ${regionName} delegation for ZIP ${cleanZip}. Texas legislative districts can cross ZIP boundaries. If needed, you can fine-tune your exact seats below.`
       : `Non-Texas ZIP detected (${cleanZip}). Defaulted to Texas Capitol district delegation (Austin TX-37 / SD-14 / HD-49).`,
   };
 }

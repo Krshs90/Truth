@@ -1,24 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Compass,
-  MapPin,
-  ShieldCheck,
-  CheckCircle2,
+  Search,
+  Check,
   ArrowRight,
   ArrowLeft,
   Cpu,
-  Search,
-  Scale,
+  MapPin,
+  CheckCircle2,
+  ExternalLink,
+  Radio,
+  SlidersHorizontal,
+  ShieldCheck,
 } from 'lucide-react';
 import { useCivic } from '../../context/CivicContext';
 import { TEXAS_DISTRICTS } from '../../data/districts';
-import { OrbIndicator } from '../common/OrbIndicator';
+import { CustomDistrictDropdown } from '../ui/CustomDistrictDropdown';
+import { SculptureHero } from './SculptureHero';
 
 interface OnboardingModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const heroFadeVariants = {
+  enter: {
+    opacity: 0,
+  },
+  center: {
+    opacity: 1,
+    transition: {
+      duration: 0.35,
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.25,
+      ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
+    },
+  },
+};
+
+const parallaxSlideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0,
+    filter: 'blur(8px)',
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    filter: 'blur(0px)',
+    transition: {
+      type: 'spring' as const,
+      stiffness: 240,
+      damping: 28,
+      mass: 0.85,
+    },
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? '-100%' : '100%',
+    opacity: 0,
+    filter: 'blur(8px)',
+    transition: {
+      duration: 0.3,
+      ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
+    },
+  }),
+};
+
+const backgroundParallaxVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '35%' : '-35%',
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 0.035,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+    },
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? '-35%' : '35%',
+    opacity: 0,
+    transition: {
+      duration: 0.28,
+      ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
+    },
+  }),
+};
 
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) => {
   const {
@@ -34,36 +108,97 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
     checkOllamaHealth,
     updateOllamaConfig,
     ollamaConfig,
+    autoStartOllama,
+    setAutoStartOllama,
   } = useCivic();
 
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(0);
+  const [direction, setDirection] = useState<number>(1);
   const [zipInput, setZipInput] = useState(activeZip || '78701');
   const [zipMessage, setZipMessage] = useState<string | null>(null);
+  const [isOutOfState, setIsOutOfState] = useState<boolean>(false);
+
   const [isPingingAi, setIsPingingAi] = useState(false);
+  const [lastPingLatency, setLastPingLatency] = useState<number | null>(null);
+  const [showManualDropdowns, setShowManualDropdowns] = useState(false);
+
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadStage, setDownloadStage] = useState<string>('');
+  const [downloadCompleted, setDownloadCompleted] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setStep(0);
+      setDirection(1);
+      const origOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = origOverflow;
+      };
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (step === 3) {
+      checkOllamaHealth();
+    }
+  }, [step]);
 
   if (!isOpen) return null;
 
-  const handleZipLookup = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (zipInput.trim().length === 5) {
-      const res = lookupByZip(zipInput.trim());
-      setZipMessage(res.notes);
-    }
+  const goToStep = (newStep: number) => {
+    setDirection(newStep > step ? 1 : -1);
+    setStep(newStep);
   };
 
-  const selectMetroPreset = (cdId: string, sdId: string, hdId: string, zip: string) => {
-    setCongressional(cdId);
-    setStateSenate(sdId);
-    setStateHouse(hdId);
-    setZipInput(zip);
-    lookupByZip(zip);
-    setZipMessage(`Loaded metro delegation configuration (${zip}).`);
+  const handleZipLookup = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const clean = zipInput.trim();
+    if (clean.length === 5) {
+      const res = lookupByZip(clean);
+      setZipMessage(res.notes);
+      setIsOutOfState(res.notes.includes('is in '));
+    }
   };
 
   const handleTestAi = async () => {
     setIsPingingAi(true);
+    const start = performance.now();
     await checkOllamaHealth();
+    const elapsed = Math.round(performance.now() - start);
+    setLastPingLatency(elapsed);
     setIsPingingAi(false);
+  };
+
+  const handleStartDownload = async () => {
+    if (isDownloading || downloadCompleted) return;
+    setIsDownloading(true);
+    setDownloadStage('Checking your local Ollama installation...');
+    try {
+      const res = await fetch('/api/ai/health');
+      const data = res.ok ? await res.json() : null;
+      const installed: string[] = data?.available ? data.models || [] : [];
+      if (!data?.available) {
+        setDownloadStage('Ollama is not running. Install/start Ollama, then try again.');
+      } else if (installed.some((m) => m.toLowerCase().startsWith('llama3.2'))) {
+        setDownloadCompleted(true);
+        setDownloadStage('Llama 3.2 detected. Local inference enabled.');
+        updateOllamaConfig({ enabled: true, model: 'llama3.2' });
+      } else {
+        setDownloadStage('Llama 3.2 is not installed. Run "ollama pull llama3.2" in a terminal, then click again.');
+      }
+    } catch {
+      setDownloadStage('Could not reach the local API. Make sure the app server is running.');
+    }
+    await checkOllamaHealth();
+    setIsDownloading(false);
+  };
+
+  const handleContinueFromStep2 = () => {
+    if (zipInput.trim().length === 5) {
+      lookupByZip(zipInput.trim());
+    }
+    goToStep(3);
   };
 
   const handleComplete = () => {
@@ -75,562 +210,647 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
   const senateDistricts = TEXAS_DISTRICTS.filter((d) => d.type === 'state_senate');
   const houseDistricts = TEXAS_DISTRICTS.filter((d) => d.type === 'state_house');
 
+  const stepTitles = [
+    'Civic Overview',
+    'Mission & Principles',
+    'District Selection',
+    'Privacy & Inference',
+    'Review & Begin',
+  ];
+
+  const hasLlama32 =
+    downloadCompleted ||
+    Boolean(ollamaStatus?.models?.some((m) => m.toLowerCase().includes('llama3.2')));
+
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="onboarding-dialog-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.94, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.94, y: 16 }}
-        transition={{ type: 'spring', stiffness: 340, damping: 26, mass: 0.8 }}
-        className="w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh] rounded-3xl border shadow-2xl"
-        style={{
-          background: '#1A1A1A',
-          borderColor: '#2A2A2A',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.85)',
-          color: '#FFFFEB',
-        }}
-      >
-        {/* Top Header / Progress Ribbon */}
-        <div
-          className="p-5 md:px-8 border-b"
-          style={{
-            background: '#141414',
-            borderColor: '#2A2A2A',
-          }}
+    <AnimatePresence mode="wait">
+      {step === 0 ? (
+        <motion.div
+          key="hero-fullscreen"
+          variants={heroFadeVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          className="fixed inset-0 z-50 w-screen h-screen overflow-hidden bg-[#111110]"
         >
-          <div className="flex items-center justify-between">
+          <SculptureHero
+            onBegin={() => goToStep(1)}
+            src="/texas_shape.png"
+            darkSrc="/texas_shape.png"
+            mobileSrc="/texas_shape.png"
+            mobileDarkSrc="/texas_shape.png"
+            imageBackground="#000000"
+            primaryCta={{ label: 'Begin' }}
+            backdropText="TRUTH"
+            headline={'TRUTH\nSee beyond the spin.'}
+            headlineAccent="the spin."
+            body="Understand your candidates. Investigate the claims. Decide for yourself."
+            eyebrow=""
+          />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="onboarding-fullscreen"
+          custom={direction}
+          variants={parallaxSlideVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="onboarding-phase-title"
+          className="fixed inset-0 z-50 w-screen h-screen overflow-hidden bg-[#0C0C0B] text-[#FFFFEB] flex flex-col justify-between select-none"
+        >
+          <div
+            className="px-6 sm:px-10 py-4 border-b flex items-center justify-between shrink-0"
+            style={{
+              background: '#10100F',
+              borderColor: '#20201F',
+            }}
+          >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white">
-                <Scale className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-base font-bold text-[#FFFFEB] tracking-tight block">
-                  TRUTH
-                </span>
-                <span className="text-xs text-blue-400 block -mt-0.5">
-                  Texas Civic Intelligence Onboarding
-                </span>
-              </div>
+              <img src="/logo.png" alt="Truth" className="w-5 h-5 object-contain" />
+              <span className="text-xs font-mono font-bold tracking-widest text-amber-400">
+                TRUTH
+              </span>
+              <span className="text-[#333333]">•</span>
+              <span className="text-[11px] font-mono tracking-widest text-[#888888] uppercase font-semibold">
+                PHASE 0{step} / 04
+              </span>
+              <span className="text-[#333333]">•</span>
+              <span className="text-xs font-medium text-[#CCCCCC] truncate">
+                {stepTitles[step]}
+              </span>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-mono">
-              <OrbIndicator status="ready" size={8} />
-              <span className="font-bold text-white">Step {step}</span>
-              <span className="text-slate-500">of 4</span>
+            <div className="text-[11px] font-mono text-[#666666] tracking-wider uppercase hidden sm:block">
+              Texas Civic Intelligence
             </div>
           </div>
 
-          {/* Progress Indicators */}
-          <div className="grid grid-cols-4 gap-2 mt-4 pt-3 border-t text-[11px] font-mono" style={{ borderColor: '#2A2A2A' }}>
-            <div className={`pb-1 border-b-2 transition-colors ${step >= 1 ? 'border-blue-500 text-blue-400 font-bold' : 'border-[#2A2A2A] text-slate-500'}`}>
-              01 Mission
-            </div>
-            <div className={`pb-1 border-b-2 transition-colors ${step >= 2 ? 'border-blue-500 text-blue-400 font-bold' : 'border-[#2A2A2A] text-slate-500'}`}>
-              02 District
-            </div>
-            <div className={`pb-1 border-b-2 transition-colors ${step >= 3 ? 'border-blue-500 text-blue-400 font-bold' : 'border-[#2A2A2A] text-slate-500'}`}>
-              03 Engine
-            </div>
-            <div className={`pb-1 border-b-2 transition-colors ${step >= 4 ? 'border-blue-500 text-blue-400 font-bold' : 'border-[#2A2A2A] text-slate-500'}`}>
-              04 Launch
-            </div>
+          <div className="w-full h-[2px] bg-[#1A1A19] overflow-hidden shrink-0">
+            <motion.div
+              className="h-full bg-amber-400"
+              initial={false}
+              animate={{ width: `${(step / 4) * 100}%` }}
+              transition={{ type: 'spring', stiffness: 280, damping: 28 }}
+            />
           </div>
-        </div>
 
-        {/* Modal Body with Scrollable Area */}
-        <div className="p-6 md:p-8 overflow-y-auto space-y-6 flex-1 text-slate-200">
-          <AnimatePresence mode="wait">
-            {/* STEP 1: Welcome & Mission */}
-            {step === 1 && (
+          <div className="flex-1 relative w-full overflow-hidden flex items-center justify-center">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-                className="space-y-6"
+                key={`watermark-${step}`}
+                custom={direction}
+                variants={backgroundParallaxVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="absolute right-8 md:right-16 bottom-6 md:bottom-10 pointer-events-none select-none font-serif text-[18vw] leading-none text-white font-black z-0"
               >
+                0{step}
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-6 sm:px-12 py-6 overflow-y-auto no-scrollbar">
+              <div className="w-full max-w-2xl my-auto">
+                <AnimatePresence mode="wait" custom={direction}>
+                  {step === 1 && (
+                    <motion.div
+                      key="phase-1"
+                      custom={direction}
+                      variants={parallaxSlideVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      className="space-y-6 sm:space-y-7 my-auto p-6 sm:p-8 rounded-2xl border bg-[#141413] border-[#242423] shadow-2xl"
+                    >
                 <div>
-                  <span className="text-xs font-mono uppercase tracking-wider text-blue-400 font-bold">
-                    Civic Mission & Ethics Charter
-                  </span>
-                  <h2 id="onboarding-dialog-title" className="text-2xl md:text-3xl font-serif font-bold text-[#FFFFEB] mt-1">
+                  <h2
+                    id="onboarding-phase-title"
+                    className="text-2xl sm:text-3xl font-serif font-bold text-[#FFFFEB] tracking-tight leading-snug"
+                  >
                     See beyond the political spin.
                   </h2>
-                  <p className="text-sm text-slate-300 mt-2 leading-relaxed opacity-90">
-                    Voters encounter thousands of campaign advertisements, political soundbites, and misleading claims each election cycle. Truth is built to connect every claim directly to original government records and official legislative journals.
+                  <p className="text-xs sm:text-sm text-[#999999] mt-2.5 leading-relaxed">
+                    Truth connects political advertisements, speeches, campaign promises, and contentious claims directly to primary statutory bills, roll-call records, and official journals.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-                  <div
-                    className="p-4 rounded-2xl border space-y-2"
-                    style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-blue-950/60 text-blue-300 border border-blue-500/30 flex items-center justify-center">
-                      <ShieldCheck className="w-4 h-4" />
+                <div className="space-y-3.5 sm:space-y-4 pt-1">
+                  <div className="flex items-start gap-3.5 sm:gap-4 pb-3.5 sm:pb-4 border-b border-[#242424]">
+                    <span className="text-xs font-mono text-amber-400 font-semibold pt-0.5 shrink-0">
+                      01
+                    </span>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-semibold text-[#FFFFEB]">
+                        Strictly Nonpartisan by Architecture
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-[#888888] mt-1 leading-relaxed">
+                        Truth never endorses candidates, never accepts campaign funding, and never prescribes how to vote. The platform exists solely to present verifiable evidence.
+                      </p>
                     </div>
-                    <h3 className="text-xs font-bold text-[#FFFFEB]">Strictly Nonpartisan</h3>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Truth never endorses candidates, never accepts campaign funds, and never tells you how to vote. We empower you to decide for yourself.
-                    </p>
                   </div>
 
-                  <div
-                    className="p-4 rounded-2xl border space-y-2"
-                    style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 flex items-center justify-center">
-                      <CheckCircle2 className="w-4 h-4" />
+                  <div className="flex items-start gap-3.5 sm:gap-4 pb-3.5 sm:pb-4 border-b border-[#242424]">
+                    <span className="text-xs font-mono text-amber-400 font-semibold pt-0.5 shrink-0">
+                      02
+                    </span>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-semibold text-[#FFFFEB]">
+                        Primary Government Sources First
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-[#888888] mt-1 leading-relaxed">
+                        Every legislative action links straight to Texas Legislature Online (TLO) or the Congressional Record. Secondary articles provide context but never replace statutory text.
+                      </p>
                     </div>
-                    <h3 className="text-xs font-bold text-[#FFFFEB]">Primary Sources First</h3>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Every bill, recorded vote, and assertion links directly to Texas Legislature Online, the Congressional Record, or official agency records.
-                    </p>
                   </div>
 
-                  <div
-                    className="p-4 rounded-2xl border space-y-2"
-                    style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-purple-950/60 text-purple-300 border border-purple-500/30 flex items-center justify-center">
-                      <Compass className="w-4 h-4" />
+                  <div className="flex items-start gap-3.5 sm:gap-4">
+                    <span className="text-xs font-mono text-amber-400 font-semibold pt-0.5 shrink-0">
+                      03
+                    </span>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-semibold text-[#FFFFEB]">
+                        Zero Tracking & Private by Default
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-[#888888] mt-1 leading-relaxed">
+                        No user login, no tracking cookies, and no profiling. Your district selection and investigation history remain entirely on your own device.
+                      </p>
                     </div>
-                    <h3 className="text-xs font-bold text-[#FFFFEB]">100% Client-Side Privacy</h3>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      No account required. Your district preferences and research sessions stay on your own device in LocalStorage.
-                    </p>
                   </div>
-                </div>
-
-                <div
-                  className="p-3.5 rounded-2xl border text-xs flex items-start gap-2.5"
-                  style={{
-                    background: 'rgba(59, 130, 246, 0.08)',
-                    borderColor: 'rgba(59, 130, 246, 0.25)',
-                    color: '#93C5FD',
-                  }}
-                >
-                  <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Congressional App Challenge Standard:</strong> Built with zero paid APIs, zero subscriptions, and complete algorithmic transparency.
-                  </span>
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 2: District & Location Setup */}
             {step === 2 && (
               <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-                className="space-y-6"
+                key="phase-2"
+                custom={direction}
+                variants={parallaxSlideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="space-y-4 sm:space-y-5 my-auto p-6 sm:p-8 rounded-2xl border bg-[#141413] border-[#242423] shadow-2xl"
               >
                 <div>
-                  <span className="text-xs font-mono uppercase tracking-wider text-blue-400 font-bold">
-                    Location & Representation
-                  </span>
-                  <h2 className="text-2xl font-serif font-bold text-[#FFFFEB] mt-1">
-                    Connect your Texas district.
+                  <h2
+                    id="onboarding-phase-title"
+                    className="text-2xl sm:text-3xl font-serif font-bold text-[#FFFFEB] tracking-tight leading-snug"
+                  >
+                    Select your Texas delegation.
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                    Enter any Texas 5-digit ZIP code or choose a Texas metropolitan region. You can fine-tune your exact legislative delegation at any time.
+                  <p className="text-xs sm:text-sm text-[#999999] mt-1.5 leading-relaxed">
+                    Enter your 5-digit Texas ZIP code. Your specific local code is directly preserved across all research and voting queries.
                   </p>
                 </div>
 
-                {/* ZIP Lookup Box */}
-                <div
-                  className="p-4 rounded-2xl border space-y-3"
-                  style={{ background: '#222222', borderColor: '#2F2F2F' }}
+                <motion.div
+                  layout
+                  className="p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+                  style={{ background: '#181818', borderColor: '#2B2B2B' }}
                 >
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
-                    Option A: Enter Texas ZIP Code
-                  </label>
-                  <form onSubmit={handleZipLookup} className="flex gap-2">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span className="font-mono text-[11px] text-[#888888] uppercase tracking-wider">
+                      Selected Delegation (ZIP: {zipInput || activeZip || '78701'}):
+                    </span>
+                  </div>
+                  <div className="flex items-center flex-wrap gap-1.5 font-mono text-[11px]">
+                    <span className="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/30 text-amber-300 font-semibold">
+                      TX-{selectedCongressional.districtNumber}
+                    </span>
+                    <span className="text-[#555]">•</span>
+                    <span className="px-2 py-0.5 rounded-md bg-[#242424] border border-[#333] text-[#CCC]">
+                      SD-{selectedStateSenate.districtNumber}
+                    </span>
+                    <span className="text-[#555]">•</span>
+                    <span className="px-2 py-0.5 rounded-md bg-[#242424] border border-[#333] text-[#CCC]">
+                      HD-{selectedStateHouse.districtNumber}
+                    </span>
+                  </div>
+                </motion.div>
+
+                <form onSubmit={handleZipLookup} className="space-y-1.5">
+                  <div className="flex items-center gap-2">
                     <div className="relative flex-1">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                      <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#666666] pointer-events-none" />
                       <input
                         type="text"
                         pattern="[0-9]{5}"
                         maxLength={5}
                         value={zipInput}
-                        onChange={(e) => setZipInput(e.target.value.replace(/\D/g, ''))}
-                        placeholder="e.g. 78701, 75201, 77002, 78205, 79901"
-                        className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border focus:outline-hidden focus:ring-1 focus:ring-blue-500 font-mono text-[#FFFFEB]"
-                        style={{ background: '#1A1A1A', borderColor: '#333333' }}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          setZipInput(val);
+                          if (val.length === 5) {
+                            const res = lookupByZip(val);
+                            setZipMessage(res.notes);
+                            setIsOutOfState(res.notes.includes('is in '));
+                          }
+                        }}
+                        placeholder="Enter your 5-digit ZIP code (e.g. 78704, 75201, 77002)"
+                        className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border font-mono text-[#FFFFEB] placeholder:text-[#555555] focus:outline-hidden focus:border-amber-400 transition-colors"
+                        style={{ background: '#121212', borderColor: '#2B2B2B' }}
                       />
                     </div>
                     <motion.button
-                      whileHover={{ y: -1 }}
                       whileTap={{ scale: 0.97 }}
                       type="submit"
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#242424] hover:bg-[#2F2F2F] text-[#FFFFEB] border border-[#333333] transition-colors cursor-pointer shrink-0"
                     >
-                      Match Districts
+                      Lookup
                     </motion.button>
-                  </form>
+                  </div>
 
                   {zipMessage && (
-                    <div className="p-2.5 bg-blue-950/40 text-blue-300 rounded-xl text-xs border border-blue-500/30">
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`text-[11px] font-mono px-2.5 py-1.5 rounded-lg border ${
+                        isOutOfState
+                          ? 'bg-amber-950/30 border-amber-500/30 text-amber-300'
+                          : 'bg-[#181818] border-[#2A2A2A] text-amber-300/90'
+                      }`}
+                    >
                       {zipMessage}
-                    </div>
+                    </motion.div>
                   )}
-                </div>
+                </form>
 
-                {/* Option B: Metro 1-Click Presets */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
-                    Option B: Quick Texas Metro Presets
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => selectMetroPreset('tx-cd-37', 'tx-sd-14', 'tx-hd-49', '78701')}
-                      className="p-3 rounded-2xl border text-left transition-colors cursor-pointer hover:border-blue-500"
-                      style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                    >
-                      <div className="font-bold text-[#FFFFEB]">Austin / Central TX</div>
-                      <div className="text-[11px] text-slate-400 font-mono">TX-37 • SD-14 • HD-49</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => selectMetroPreset('tx-cd-30', 'tx-sd-23', 'tx-hd-100', '75201')}
-                      className="p-3 rounded-2xl border text-left transition-colors cursor-pointer hover:border-blue-500"
-                      style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                    >
-                      <div className="font-bold text-[#FFFFEB]">Dallas / North TX</div>
-                      <div className="text-[11px] text-slate-400 font-mono">TX-30 • SD-23 • HD-100</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => selectMetroPreset('tx-cd-18', 'tx-sd-15', 'tx-hd-147', '77002')}
-                      className="p-3 rounded-2xl border text-left transition-colors cursor-pointer hover:border-blue-500"
-                      style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                    >
-                      <div className="font-bold text-[#FFFFEB]">Houston / Gulf Coast</div>
-                      <div className="text-[11px] text-slate-400 font-mono">TX-18 • SD-15 • HD-147</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => selectMetroPreset('tx-cd-20', 'tx-sd-26', 'tx-hd-123', '78205')}
-                      className="p-3 rounded-2xl border text-left transition-colors cursor-pointer hover:border-blue-500"
-                      style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                    >
-                      <div className="font-bold text-[#FFFFEB]">San Antonio / Alamo</div>
-                      <div className="text-[11px] text-slate-400 font-mono">TX-20 • SD-26 • HD-123</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => selectMetroPreset('tx-cd-16', 'tx-sd-29', 'tx-hd-77', '79901')}
-                      className="p-3 rounded-2xl border text-left transition-colors cursor-pointer hover:border-blue-500"
-                      style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                    >
-                      <div className="font-bold text-[#FFFFEB]">El Paso / West TX</div>
-                      <div className="text-[11px] text-slate-400 font-mono">TX-16 • SD-29 • HD-77</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => selectMetroPreset('tx-cd-15', 'tx-sd-20', 'tx-hd-36', '78501')}
-                      className="p-3 rounded-2xl border text-left transition-colors cursor-pointer hover:border-blue-500"
-                      style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                    >
-                      <div className="font-bold text-[#FFFFEB]">Rio Grande Valley</div>
-                      <div className="text-[11px] text-slate-400 font-mono">TX-15 • SD-20 • HD-36</div>
-                    </button>
-                  </div>
-                </div>
+                <div className="pt-1.5 border-t border-[#242424] space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setShowManualDropdowns(!showManualDropdowns)}
+                    className="text-xs text-[#888888] hover:text-[#CCCCCC] flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
+                    <span>
+                      {showManualDropdowns ? 'Hide manual seat selectors' : 'Fine-tune individual seats with custom dropdowns'}
+                    </span>
+                  </button>
 
-                {/* Option C: Manual District Selectors */}
-                <div
-                  className="p-4 rounded-2xl border space-y-3"
-                  style={{ background: '#222222', borderColor: '#2F2F2F' }}
-                >
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
-                    Option C: Configure Precise Districts
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                      <span className="text-[11px] text-slate-400 block mb-1">U.S. House</span>
-                      <select
-                        value={selectedCongressional.id}
-                        onChange={(e) => setCongressional(e.target.value)}
-                        className="w-full p-2 text-xs rounded-xl border text-[#FFFFEB]"
-                        style={{ background: '#1A1A1A', borderColor: '#333333' }}
+                  <AnimatePresence>
+                    {showManualDropdowns && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2.5 pt-1"
                       >
-                        {congressionalDistricts.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            TX-{d.districtNumber}: {d.name.replace('Texas Congressional District ', 'CD-')}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                        <CustomDistrictDropdown
+                          label="U.S. Congressional District"
+                          badgePrefix="TX-"
+                          selectedId={selectedCongressional.id}
+                          options={congressionalDistricts}
+                          onSelect={setCongressional}
+                        />
 
-                    <div>
-                      <span className="text-[11px] text-slate-400 block mb-1">TX Senate</span>
-                      <select
-                        value={selectedStateSenate.id}
-                        onChange={(e) => setStateSenate(e.target.value)}
-                        className="w-full p-2 text-xs rounded-xl border text-[#FFFFEB]"
-                        style={{ background: '#1A1A1A', borderColor: '#333333' }}
-                      >
-                        {senateDistricts.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            Senate District {d.districtNumber}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                        <CustomDistrictDropdown
+                          label="Texas State Senate District"
+                          badgePrefix="SD-"
+                          selectedId={selectedStateSenate.id}
+                          options={senateDistricts}
+                          onSelect={setStateSenate}
+                        />
 
-                    <div>
-                      <span className="text-[11px] text-slate-400 block mb-1">TX House</span>
-                      <select
-                        value={selectedStateHouse.id}
-                        onChange={(e) => setStateHouse(e.target.value)}
-                        className="w-full p-2 text-xs rounded-xl border text-[#FFFFEB]"
-                        style={{ background: '#1A1A1A', borderColor: '#333333' }}
-                      >
-                        {houseDistricts.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            House District {d.districtNumber}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
+                        <CustomDistrictDropdown
+                          label="Texas State House District"
+                          badgePrefix="HD-"
+                          selectedId={selectedStateHouse.id}
+                          options={houseDistricts}
+                          onSelect={setStateHouse}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 3: Local Engine & AI Configuration */}
             {step === 3 && (
               <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-                className="space-y-6"
+                key="phase-3"
+                custom={direction}
+                variants={parallaxSlideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="space-y-4 sm:space-y-5 my-auto p-6 sm:p-8 rounded-2xl border bg-[#141413] border-[#242423] shadow-2xl"
               >
                 <div>
-                  <span className="text-xs font-mono uppercase tracking-wider text-blue-400 font-bold">
-                    Privacy & Computational Engine
-                  </span>
-                  <h2 className="text-2xl font-serif font-bold text-[#FFFFEB] mt-1">
-                    Free, local, zero-tracking AI.
+                  <h2
+                    id="onboarding-phase-title"
+                    className="text-2xl sm:text-3xl font-serif font-bold text-[#FFFFEB] tracking-tight leading-snug"
+                  >
+                    100% Free, local engine.
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                    Truth is 100% free and never uses paid cloud AI APIs. All investigations use our deterministic primary-record engine, with optional local Ollama assistance.
+                  <p className="text-xs sm:text-sm text-[#999999] mt-1.5 leading-relaxed">
+                    Truth operates entirely on your machine. Claim extraction and statutory evidence matching run with zero cloud dependency.
                   </p>
                 </div>
 
-                {/* Local AI / Ollama Card */}
                 <div
-                  className="p-5 rounded-2xl border space-y-4"
-                  style={{ background: '#222222', borderColor: '#2F2F2F' }}
+                  className="p-4 rounded-xl border space-y-3.5"
+                  style={{ background: '#171717', borderColor: '#2A2A2A' }}
                 >
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <Cpu className="w-5 h-5 text-blue-400" />
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center shrink-0">
+                        <Cpu className="w-5 h-5 text-amber-400" />
+                      </div>
                       <div>
-                        <h3 className="font-bold text-[#FFFFEB] text-sm">
-                          Optional Local AI (Ollama)
-                        </h3>
-                        <span className="text-[11px] text-slate-400">
-                          Private on-device inference via local Ollama server
-                        </span>
+                        <div className="text-sm font-semibold text-[#FFFFEB]">
+                          Local Ollama Inference
+                        </div>
+                        <div className="text-[11px] text-[#777777]">
+                          Private on-device AI model daemon
+                        </div>
                       </div>
                     </div>
 
                     <motion.button
-                      whileHover={{ y: -1 }}
-                      whileTap={{ scale: 0.97 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.96 }}
                       type="button"
                       onClick={handleTestAi}
                       disabled={isPingingAi}
-                      className="px-3.5 py-1.5 rounded-xl border text-slate-200 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
-                      style={{ background: '#1A1A1A', borderColor: '#333333' }}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-[#FFFFEB] bg-[#222222] hover:bg-[#2A2A2A] border border-[#383838] transition-all cursor-pointer flex items-center justify-center gap-2 shrink-0 shadow-xs"
                     >
                       {isPingingAi ? (
-                        <div className="w-3.5 h-3.5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+                        <>
+                          <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                          <span>Pinging Daemon...</span>
+                        </>
                       ) : (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                          <span>Test Ping</span>
+                        </>
                       )}
-                      <span>Test Connection</span>
                     </motion.button>
                   </div>
 
-                  <div
-                    className="p-3.5 rounded-xl border text-xs space-y-1.5 font-mono"
-                    style={{ background: '#1A1A1A', borderColor: '#2F2F2F' }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Local Status:</span>
+                  <div className="p-2.5 rounded-lg bg-[#121212] border border-[#222222] font-mono text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Radio className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-[#888888]">Daemon Ping:</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
                       {ollamaStatus?.available ? (
-                        <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                          <OrbIndicator status="verified" size={8} />
-                          Online ({ollamaStatus.models?.length || 0} models found)
+                        <span className="text-emerald-400 font-medium flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          Online ({ollamaStatus.models?.length || 0} models detected
+                          {lastPingLatency !== null ? ` • ${lastPingLatency}ms latency` : ''})
                         </span>
                       ) : (
-                        <span className="text-slate-400 font-medium flex items-center gap-1.5">
-                          <OrbIndicator status="offline" size={8} />
-                          Deterministic Engine Ready (Ollama Offline)
+                        <span className="text-[#888888] flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          Offline (Fallback: Deterministic Primary Record Search
+                          {lastPingLatency !== null ? ` • ${lastPingLatency}ms check` : ''})
                         </span>
                       )}
                     </div>
-                    {ollamaStatus?.available && ollamaStatus.models?.length ? (
-                      <div className="flex items-center justify-between pt-1 border-t border-[#2F2F2F]">
-                        <span className="text-slate-400">Detected Models:</span>
-                        <span className="font-mono text-[11px] text-slate-200">
-                          {ollamaStatus.models.join(', ')}
-                        </span>
-                      </div>
-                    ) : null}
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="enableOllama"
-                      checked={ollamaConfig.enabled}
-                      onChange={(e) => updateOllamaConfig({ enabled: e.target.checked })}
-                      className="rounded text-blue-600 cursor-pointer"
-                    />
-                    <label htmlFor="enableOllama" className="text-xs font-medium text-slate-300 cursor-pointer">
-                      Enable local AI synthesis when available (Always grounded in verified records)
-                    </label>
+                  {ollamaStatus?.models && ollamaStatus.models.length > 0 && (
+                    <div className="space-y-1.5 pt-1 border-t border-[#242424]">
+                      <div className="flex items-center justify-between text-[11px] font-mono text-[#888888]">
+                        <span className="uppercase tracking-wider">Select Active Model ({ollamaStatus.models.length} installed):</span>
+                        <span className="text-amber-300 font-semibold">{ollamaConfig.model || ollamaStatus.models[0]}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 max-h-16 overflow-y-auto no-scrollbar">
+                        {ollamaStatus.models.map((m) => {
+                          const isCur = (ollamaConfig.model || ollamaStatus.models[0]) === m;
+                          return (
+                            <button
+                              key={m}
+                              type="button"
+                              onClick={() => updateOllamaConfig({ model: m, enabled: true })}
+                              className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                                isCur
+                                  ? 'bg-amber-400 text-[#141414] font-bold border border-amber-300 shadow-xs'
+                                  : 'bg-[#1F1F1F] text-[#CCCCCC] border border-[#2E2E2E] hover:border-[#444]'
+                              }`}
+                            >
+                              {m}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-[#242424] flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-semibold text-[#FFFFEB]">
+                        Auto-start & connect to Ollama engine
+                      </div>
+                      <div className="text-[11px] text-[#777777] leading-relaxed mt-0.5">
+                        When Truth starts on Windows, automatically launch local daemon on port 11434.
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={autoStartOllama}
+                      onClick={() => setAutoStartOllama(!autoStartOllama)}
+                      className={`w-11 h-6 rounded-full px-0.5 transition-colors cursor-pointer relative shrink-0 border flex items-center ${
+                        autoStartOllama
+                          ? 'bg-amber-400 border-amber-300'
+                          : 'bg-[#222222] border-[#383838]'
+                      }`}
+                    >
+                      <motion.div
+                        layout
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        className={`w-4.5 h-4.5 rounded-full shadow-md ${
+                          autoStartOllama ? 'bg-[#141414] translate-x-5' : 'bg-[#777777] translate-x-0'
+                        }`}
+                      />
+                    </button>
                   </div>
+                </div>
+
+                <div
+                  className="p-3.5 rounded-xl border space-y-2"
+                  style={{ background: '#171717', borderColor: '#2A2A2A' }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-semibold text-[#FFFFEB]">
+                        Recommended Model: Llama 3.2 3B
+                      </div>
+                      <div className="text-[10px] text-[#777777]">
+                        Lightweight on-device instruction model for claim extraction
+                      </div>
+                    </div>
+
+                    {hasLlama32 ? (
+                      <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1.5 font-semibold">
+                        <Check className="w-3.5 h-3.5" /> Llama 3.2 Installed & Ready
+                      </span>
+                    ) : (
+                      <motion.button
+                        whileTap={{ scale: 0.96 }}
+                        type="button"
+                        onClick={handleStartDownload}
+                        disabled={isDownloading}
+                        className="px-3 py-1.5 text-xs font-semibold text-[#141414] bg-amber-400 hover:bg-amber-300 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        {isDownloading ? 'Checking...' : 'Detect Llama 3.2'}
+                      </motion.button>
+                    )}
+                  </div>
+
+                  {downloadStage && (
+                    <div className="text-[10px] font-mono text-[#888888] pt-1">{downloadStage}</div>
+                  )}
+
+                  {!ollamaStatus?.available && (
+                    <div className="pt-1.5 border-t border-[#242424] flex items-center justify-between text-[11px]">
+                      <span className="text-[#777777]">Need Ollama for Windows?</span>
+                      <a
+                        href="https://ollama.com/download"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
+                      >
+                        <span>Download Ollama</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 4: Review & Launch */}
             {step === 4 && (
               <motion.div
-                key="step4"
-                initial={{ opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-                className="space-y-6"
+                key="phase-4"
+                custom={direction}
+                variants={parallaxSlideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="space-y-4 sm:space-y-5 my-auto p-6 sm:p-8 rounded-2xl border bg-[#141413] border-[#242423] shadow-2xl"
               >
                 <div>
-                  <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold">
-                    Setup Complete
-                  </span>
-                  <h2 className="text-2xl font-serif font-bold text-[#FFFFEB] mt-1">
-                    Ready to investigate.
+                  <h2
+                    id="onboarding-phase-title"
+                    className="text-2xl sm:text-3xl font-serif font-bold text-[#FFFFEB] tracking-tight leading-snug"
+                  >
+                    Your research station is ready.
                   </h2>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                    Your personalized civic research environment has been configured. Here is a summary of your delegation:
+                  <p className="text-xs sm:text-sm text-[#999999] mt-1.5 leading-relaxed">
+                    Here is your configured Texas civic dossier. You can adjust districts or inference settings at any time in the titlebar or settings.
                   </p>
                 </div>
 
-                {/* Summary Dossier Card */}
                 <div
-                  className="p-5 rounded-2xl border space-y-4"
-                  style={{ background: '#222222', borderColor: '#2F2F2F' }}
+                  className="p-4 rounded-xl border space-y-2.5 font-mono text-xs"
+                  style={{ background: '#171717', borderColor: '#282828' }}
                 >
-                  <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: '#333333' }}>
-                    <div className="flex items-center gap-2 text-xs font-bold text-blue-400 font-mono">
-                      <MapPin className="w-4 h-4" />
-                      <span>Configured Texas Delegation (ZIP: {activeZip})</span>
-                    </div>
-                    <span className="text-[11px] text-emerald-400 font-mono">Verified Primary Links Ready</span>
+                  <div className="flex items-center gap-2 text-amber-400 pb-2 border-b border-[#262626]">
+                    <MapPin className="w-4 h-4" />
+                    <span className="font-semibold">Configured Delegation (ZIP: {activeZip})</span>
                   </div>
 
-                  <div className="space-y-2.5 text-xs font-mono">
-                    <div className="flex items-center justify-between py-1 border-b" style={{ borderColor: '#2F2F2F' }}>
-                      <span className="text-slate-400">Congressional:</span>
-                      <span className="font-semibold text-[#FFFFEB]">{selectedCongressional.name}</span>
-                    </div>
-                    <div className="flex items-center justify-between py-1 border-b" style={{ borderColor: '#2F2F2F' }}>
-                      <span className="text-slate-400">Texas Senate:</span>
-                      <span className="font-semibold text-[#FFFFEB]">{selectedStateSenate.name}</span>
-                    </div>
-                    <div className="flex items-center justify-between py-1 border-b" style={{ borderColor: '#2F2F2F' }}>
-                      <span className="text-slate-400">Texas House:</span>
-                      <span className="font-semibold text-[#FFFFEB]">{selectedStateHouse.name}</span>
-                    </div>
-                    <div className="flex items-center justify-between py-1">
-                      <span className="text-slate-400">Counties Covered:</span>
-                      <span className="font-semibold text-slate-300">
-                        {Array.from(new Set([...selectedCongressional.majorCounties, ...selectedStateSenate.majorCounties])).join(', ')}
-                      </span>
-                    </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1 border-b border-[#222222] gap-1">
+                    <span className="text-[#777777]">U.S. House:</span>
+                    <span className="text-[#FFFFEB] font-medium truncate">{selectedCongressional.name}</span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1 border-b border-[#222222] gap-1">
+                    <span className="text-[#777777]">Texas Senate:</span>
+                    <span className="text-[#FFFFEB] font-medium truncate">{selectedStateSenate.name}</span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between py-1 gap-1">
+                    <span className="text-[#777777]">Texas House:</span>
+                    <span className="text-[#FFFFEB] font-medium truncate">{selectedStateHouse.name}</span>
                   </div>
                 </div>
 
-                <div
-                  className="p-4 rounded-2xl border text-xs text-slate-300 space-y-1.5"
-                  style={{ background: '#1A1A1A', borderColor: '#2F2F2F' }}
-                >
-                  <div className="font-bold text-[#FFFFEB]">What you can do right now:</div>
-                  <ul className="list-disc list-inside space-y-0.5 text-[11px] text-slate-400">
-                    <li>Investigate any political ad quotation or speech claim in the Claim Workspace.</li>
-                    <li>Compare candidates side-by-side using documented policy stances and roll calls.</li>
-                    <li>Track live Texas bills from the 88th and 89th Legislature with direct journal tallies.</li>
-                    <li>Revisit this setup wizard anytime from the top navigation bar or Settings.</li>
-                  </ul>
+                <div className="text-xs text-[#888888] space-y-2 pt-1">
+                  <div className="flex items-center gap-2 text-[#CCCCCC]">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Fact-check political claims using the bottom floating island or Investigate tab.</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[#CCCCCC]">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Compare candidate voting records side-by-side with statutory bill histories.</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[#CCCCCC]">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Primary legislative records link straight to Texas Legislature Online (TLO).</span>
+                  </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-
-        {/* Modal Footer Controls */}
-        <div
-          className="p-4 md:px-8 border-t flex items-center justify-between"
-          style={{ background: '#141414', borderColor: '#2A2A2A' }}
-        >
-          {step > 1 ? (
-            <motion.button
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.97 }}
-              type="button"
-              onClick={() => setStep(step - 1)}
-              className="px-4 py-2 border text-slate-300 hover:text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
-              style={{ background: '#242424', borderColor: '#2F2F2F' }}
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back</span>
-            </motion.button>
-          ) : (
-            <span className="text-xs text-slate-500 font-mono">Truth Texas Civic Suite</span>
-          )}
-
-          {step < 4 ? (
-            <motion.button
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.97 }}
-              type="button"
-              onClick={() => setStep(step + 1)}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
-            >
-              <span>Continue</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </motion.button>
-          ) : (
-            <motion.button
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.97 }}
-              type="button"
-              onClick={handleComplete}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-md"
-            >
-              <span>Enter Truth Workspace</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </motion.button>
-          )}
-        </div>
-      </motion.div>
+      </div>
     </div>
-  );
+
+    <div
+      className="px-6 sm:px-10 py-4 border-t flex items-center justify-between shrink-0 relative z-20"
+      style={{ background: '#10100F', borderColor: '#20201F' }}
+    >
+      {step >= 1 ? (
+        <motion.button
+          whileHover={{ x: -2 }}
+          whileTap={{ scale: 0.96 }}
+          type="button"
+          onClick={() => goToStep(step - 1)}
+          className="px-4 py-2 text-xs font-medium text-[#888888] hover:text-[#FFFFEB] hover:bg-[#1A1A19] rounded-xl border border-[#242423] transition-all flex items-center gap-1.5 cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>{step === 1 ? 'Back to Intro' : 'Back'}</span>
+        </motion.button>
+      ) : (
+        <div />
+      )}
+
+      {step === 2 ? (
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.96 }}
+          type="button"
+          onClick={handleContinueFromStep2}
+          className="px-6 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#141414] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+        >
+          <span>Continue</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </motion.button>
+      ) : step < 4 ? (
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.96 }}
+          type="button"
+          onClick={() => goToStep(step + 1)}
+          className="px-6 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#141414] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+        >
+          <span>Continue</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </motion.button>
+      ) : (
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.96 }}
+          type="button"
+          onClick={handleComplete}
+          className="px-6 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#141414] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+        >
+          <span>Launch Workspace</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </motion.button>
+      )}
+    </div>
+  </motion.div>
+)}
+</AnimatePresence>
+);
 };

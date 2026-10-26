@@ -36,7 +36,6 @@ describe('Evidence Integrity Tests (Section 15 Requirements)', () => {
 
     for (const bill of failedOrIntroducedBills) {
       expect(bill.status).not.toBe('Enacted');
-      // Verify HB 1 / voucher bill died in committee and was not enacted
       if (bill.officialBillNumber.includes('HB 1')) {
         expect(bill.status).toBe('Failed');
         expect(bill.plainEnglishExplanation.toLowerCase()).toContain('without passing into law');
@@ -62,7 +61,6 @@ describe('Evidence Integrity Tests (Section 15 Requirements)', () => {
   it('Integrity 5: Candidate positions are not inferred from party affiliation', () => {
     for (const candidate of CANDIDATES) {
       for (const pos of candidate.policyPositions) {
-        // Every documented position must have an explicit sourceTitle and sourceUrl
         expect(pos.sourceTitle).toBeTruthy();
         expect(pos.sourceUrl).toMatch(/^https?:\/\//);
         expect(pos.verificationStatus).not.toBe('Party Platform Inferred');
@@ -106,7 +104,6 @@ describe('Evidence Integrity Tests (Section 15 Requirements)', () => {
       ]) {
         expect(ev.publicationDate).toBeTruthy();
         expect(ev.retrievedAt).toBeTruthy();
-        // The retrieval date should be in ISO YYYY-MM-DD format
         expect(ev.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       }
     }

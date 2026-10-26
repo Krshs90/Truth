@@ -13,6 +13,7 @@ import { TEXAS_DISTRICTS } from '../data/districts';
 import { OFFICIALS } from '../data/officials';
 import { CANDIDATES } from '../data/candidates';
 import { NonpartisanDisclaimer } from '../components/ui/NonpartisanDisclaimer';
+import { CustomSelect } from '../components/ui/CustomSelect';
 
 export const DistrictPage: React.FC = () => {
   const {
@@ -30,6 +31,8 @@ export const DistrictPage: React.FC = () => {
   const [zipInput, setZipInput] = useState(activeZip);
   const [zipNotes, setZipNotes] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'officials' | 'candidates'>('officials');
+  const [officialScope, setOfficialScope] = useState<'my-district' | 'all'>('my-district');
+  const [officialSearchQuery, setOfficialSearchQuery] = useState('');
 
   const handleZipSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,26 +46,45 @@ export const DistrictPage: React.FC = () => {
   const senateDistricts = TEXAS_DISTRICTS.filter((d) => d.type === 'state_senate');
   const houseDistricts = TEXAS_DISTRICTS.filter((d) => d.type === 'state_house');
 
-  // Match officials for selected districts
   const currentOfficials = OFFICIALS.filter((o) => {
     if (o.jurisdiction === 'Federal' && o.district.includes('Statewide')) return true;
     if (o.district.includes(`District ${selectedCongressional.districtNumber}`)) return true;
     if (o.district.includes(`District ${selectedStateSenate.districtNumber}`)) return true;
     if (o.district.includes(`District ${selectedStateHouse.districtNumber}`)) return true;
-    if (o.jurisdiction === 'Texas Executive') return true;
+    if (o.jurisdiction === 'Texas Executive' || o.jurisdiction === 'Texas Judicial') return true;
     return false;
   });
 
-  // Match candidates for selected districts
+  const displayedOfficials = OFFICIALS.filter((o) => {
+    if (officialSearchQuery.trim()) {
+      const q = officialSearchQuery.toLowerCase();
+      return (
+        o.name.toLowerCase().includes(q) ||
+        o.office.toLowerCase().includes(q) ||
+        o.district.toLowerCase().includes(q) ||
+        o.party.toLowerCase().includes(q) ||
+        o.bioSummary.toLowerCase().includes(q)
+      );
+    }
+
+    if (officialScope === 'my-district') {
+      return currentOfficials.some((co) => co.id === o.id);
+    }
+
+    return true;
+  });
+
   const districtCandidates = CANDIDATES.filter((c) => {
     if (c.district.includes('Statewide')) return true;
+    if (c.district.includes(`District ${selectedCongressional.districtNumber}`)) return true;
+    if (c.district.includes(`TX-${selectedCongressional.districtNumber}`)) return true;
     if (c.district.includes(`District ${selectedStateSenate.districtNumber}`)) return true;
+    if (c.district.includes(`District ${selectedStateHouse.districtNumber}`)) return true;
     return false;
   });
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-2xl md:text-4xl font-serif font-bold text-[#FFFFEB] tracking-tight">
           My District & Representatives
@@ -72,7 +94,6 @@ export const DistrictPage: React.FC = () => {
         </p>
       </div>
 
-      {/* District Selection & Zip Lookup Panel */}
       <div
         className="rounded-3xl border p-6 md:p-8 space-y-6"
         style={{
@@ -83,7 +104,7 @@ export const DistrictPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="text-base font-bold text-[#FFFFEB] flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-blue-400" />
+              <MapPin className="w-4 h-4 text-amber-400" />
               <span>District Locator & Preferences</span>
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -96,14 +117,13 @@ export const DistrictPage: React.FC = () => {
                 Manual Selection Active
               </span>
             ) : (
-              <span className="text-[11px] font-mono px-2.5 py-1 rounded-full border text-blue-300" style={{ background: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)' }}>
+              <span className="text-[11px] font-mono px-2.5 py-1 rounded-full border text-amber-300" style={{ background: 'rgba(245, 158, 11, 0.1)', borderColor: 'rgba(245, 158, 11, 0.3)' }}>
                 ZIP Mapped ({activeZip})
               </span>
             )}
           </div>
         </div>
 
-        {/* ZIP Lookup Form with Explicit Electoral Disclaimer */}
         <div
           className="rounded-2xl p-4 md:p-5 border space-y-3"
           style={{
@@ -121,26 +141,24 @@ export const DistrictPage: React.FC = () => {
                 value={zipInput}
                 onChange={(e) => setZipInput(e.target.value.replace(/\D/g, ''))}
                 placeholder="Enter 5-digit Texas ZIP (e.g. 78701, 78666, 75206)"
-                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border focus:outline-hidden focus:ring-1 focus:ring-blue-500 font-mono text-[#FFFFEB]"
+                className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border focus:outline-hidden focus:ring-1 focus:ring-amber-400/50 focus:border-amber-400 font-mono text-[#FFFFEB]"
                 style={{
                   background: '#1A1A1A',
                   borderColor: '#333333',
                 }}
               />
             </div>
-            <motion.button
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.97 }}
+            <button
               type="submit"
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition-colors shrink-0 cursor-pointer shadow-sm"
+              className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-[#141414] text-xs font-semibold rounded-xl transition-colors shrink-0 cursor-pointer shadow-sm"
             >
               Update via ZIP
-            </motion.button>
+            </button>
           </form>
 
           {zipNotes && (
-            <div className="p-3 bg-blue-950/40 border border-blue-500/30 text-blue-200 rounded-xl text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+            <div className="p-3 bg-amber-950/40 border border-amber-500/30 text-amber-200 rounded-xl text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>{zipNotes}</span>
             </div>
           )}
@@ -148,121 +166,138 @@ export const DistrictPage: React.FC = () => {
           <div className="text-[11px] text-slate-400 flex items-start gap-1.5 pt-1">
             <AlertCircle className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
             <span>
-              <strong className="text-slate-300">Civic Notice:</strong> A ZIP code does not uniquely identify a congressional or state legislative district. In Texas, many ZIP codes are split across multiple districts. Use the selectors below to confirm your precise districts.
+              <strong className="text-slate-300">Civic Notice:</strong> A ZIP code does not uniquely identify a legislative district. In Texas, many ZIP codes are split across multiple districts. Use the district dropdowns below to confirm your precise seats.
             </span>
           </div>
         </div>
 
-        {/* Manual District Selectors */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-          {/* US Congressional District */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 font-mono">
-              U.S. Congressional District
-            </label>
-            <select
+            <CustomSelect
+              label="U.S. Congressional District"
               value={selectedCongressional.id}
-              onChange={(e) => setCongressional(e.target.value)}
-              className="w-full p-2.5 text-sm rounded-xl border focus:outline-hidden focus:ring-1 focus:ring-blue-500 text-[#FFFFEB] cursor-pointer"
-              style={{
-                background: '#222222',
-                borderColor: '#2A2A2A',
-              }}
-            >
-              {congressionalDistricts.map((d) => (
-                <option key={d.id} value={d.id} style={{ background: '#222222', color: '#FFFFEB' }}>
-                  TX-{d.districtNumber}: {d.name.replace('Texas Congressional District ', 'CD-')} ({d.region})
-                </option>
-              ))}
-            </select>
-            <p className="text-[11px] text-slate-400 mt-1">
+              onChange={setCongressional}
+              options={congressionalDistricts.map((d) => ({
+                value: d.id,
+                label: `TX-${d.districtNumber}: ${d.name.replace('Texas Congressional District ', 'CD-')}`,
+                badge: `TX-${d.districtNumber}`,
+                description: d.region ? `${d.region} • Counties: ${d.majorCounties.slice(0, 3).join(', ')}` : undefined,
+              }))}
+            />
+            <p className="text-[11px] text-slate-400 mt-1.5">
               Counties: {selectedCongressional.majorCounties.join(', ')}
             </p>
           </div>
 
-          {/* Texas Senate District */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 font-mono">
-              Texas Senate District
-            </label>
-            <select
+            <CustomSelect
+              label="Texas Senate District"
               value={selectedStateSenate.id}
-              onChange={(e) => setStateSenate(e.target.value)}
-              className="w-full p-2.5 text-sm rounded-xl border focus:outline-hidden focus:ring-1 focus:ring-blue-500 text-[#FFFFEB] cursor-pointer"
-              style={{
-                background: '#222222',
-                borderColor: '#2A2A2A',
-              }}
-            >
-              {senateDistricts.map((d) => (
-                <option key={d.id} value={d.id} style={{ background: '#222222', color: '#FFFFEB' }}>
-                  Senate District {d.districtNumber} ({d.region})
-                </option>
-              ))}
-            </select>
-            <p className="text-[11px] text-slate-400 mt-1">
+              onChange={setStateSenate}
+              options={senateDistricts.map((d) => ({
+                value: d.id,
+                label: `Senate District ${d.districtNumber}`,
+                badge: `SD-${d.districtNumber}`,
+                description: d.region ? `${d.region} • Counties: ${d.majorCounties.slice(0, 3).join(', ')}` : undefined,
+              }))}
+            />
+            <p className="text-[11px] text-slate-400 mt-1.5">
               Counties: {selectedStateSenate.majorCounties.join(', ')}
             </p>
           </div>
 
-          {/* Texas House District */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5 font-mono">
-              Texas House District
-            </label>
-            <select
+            <CustomSelect
+              label="Texas House District"
               value={selectedStateHouse.id}
-              onChange={(e) => setStateHouse(e.target.value)}
-              className="w-full p-2.5 text-sm rounded-xl border focus:outline-hidden focus:ring-1 focus:ring-blue-500 text-[#FFFFEB] cursor-pointer"
-              style={{
-                background: '#222222',
-                borderColor: '#2A2A2A',
-              }}
-            >
-              {houseDistricts.map((d) => (
-                <option key={d.id} value={d.id} style={{ background: '#222222', color: '#FFFFEB' }}>
-                  House District {d.districtNumber} ({d.region})
-                </option>
-              ))}
-            </select>
-            <p className="text-[11px] text-slate-400 mt-1">
+              onChange={setStateHouse}
+              options={houseDistricts.map((d) => ({
+                value: d.id,
+                label: `House District ${d.districtNumber}`,
+                badge: `HD-${d.districtNumber}`,
+                description: d.region ? `${d.region} • Counties: ${d.majorCounties.slice(0, 3).join(', ')}` : undefined,
+              }))}
+            />
+            <p className="text-[11px] text-slate-400 mt-1.5">
               Counties: {selectedStateHouse.majorCounties.join(', ')}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Tabs: Elected Officials vs Verified Candidates */}
       <div className="space-y-4">
-        <div className="border-b" style={{ borderColor: '#2A2A2A' }}>
-          <nav className="flex gap-4 -mb-px">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3" style={{ borderColor: '#2A2A2A' }}>
+          <nav className="flex gap-4">
             <button
               onClick={() => setActiveTab('officials')}
-              className={`pb-3 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
+              className={`pb-1 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
                 activeTab === 'officials'
-                  ? 'border-blue-500 text-blue-400'
+                  ? 'border-amber-400 text-amber-400'
                   : 'border-transparent text-slate-400 hover:text-white'
               }`}
             >
-              Current Elected Officials ({currentOfficials.length})
+              Current Elected Officials ({displayedOfficials.length})
             </button>
             <button
               onClick={() => setActiveTab('candidates')}
-              className={`pb-3 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
+              className={`pb-1 text-xs md:text-sm font-semibold border-b-2 transition-all cursor-pointer ${
                 activeTab === 'candidates'
-                  ? 'border-blue-500 text-blue-400'
+                  ? 'border-amber-400 text-amber-400'
                   : 'border-transparent text-slate-400 hover:text-white'
               }`}
             >
               Verified Candidates Running ({districtCandidates.length})
             </button>
           </nav>
+
+          {activeTab === 'officials' && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center rounded-xl p-0.5 border" style={{ background: '#191918', borderColor: '#2c2c2b' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOfficialScope('my-district');
+                    setOfficialSearchQuery('');
+                  }}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all cursor-pointer ${
+                    officialScope === 'my-district' && !officialSearchQuery
+                      ? 'bg-amber-400 text-stone-950 font-semibold'
+                      : 'text-stone-400 hover:text-stone-200'
+                  }`}
+                >
+                  My District ({currentOfficials.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOfficialScope('all')}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all cursor-pointer ${
+                    officialScope === 'all' || officialSearchQuery
+                      ? 'bg-amber-400 text-stone-950 font-semibold'
+                      : 'text-stone-400 hover:text-stone-200'
+                  }`}
+                >
+                  All Texas Officials ({OFFICIALS.length})
+                </button>
+              </div>
+
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 pointer-events-none" />
+                <input
+                  type="text"
+                  value={officialSearchQuery}
+                  onChange={(e) => setOfficialSearchQuery(e.target.value)}
+                  placeholder="Search officials (e.g. Brandon Gill)..."
+                  className="pl-8 pr-3 py-1 rounded-xl text-xs border focus:outline-hidden focus:border-amber-400 text-stone-200 w-48 sm:w-56 font-sans"
+                  style={{ background: '#20201f', borderColor: '#2e2e2d' }}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Tab 1: Current Elected Officials */}
         {activeTab === 'officials' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {currentOfficials.map((official) => (
+            {displayedOfficials.map((official) => (
               <motion.div
                 key={official.id}
                 whileHover={{ y: -2, borderColor: '#3A3A3A' }}
@@ -296,11 +331,10 @@ export const DistrictPage: React.FC = () => {
                     {official.bioSummary}
                   </p>
 
-                  {/* Recorded Votes Highlight */}
                   {official.recentVotes.length > 0 && (
                     <div className="mt-4 pt-3 border-t" style={{ borderColor: '#2A2A2A' }}>
                       <div className="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-1.5 font-mono">
-                        <Scale className="w-3.5 h-3.5 text-blue-400" />
+                        <Scale className="w-3.5 h-3.5 text-amber-400" />
                         <span>Documented Roll-Call Votes</span>
                       </div>
                       <div className="space-y-2">
@@ -314,7 +348,7 @@ export const DistrictPage: React.FC = () => {
                             }}
                           >
                             <div className="truncate">
-                              <span className="font-mono font-bold text-blue-400">
+                              <span className="font-mono font-bold text-amber-400">
                                 {v.billNumber}
                               </span>
                               <span className="text-slate-300 ml-1.5 truncate">
@@ -347,7 +381,6 @@ export const DistrictPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Sponsored Bills */}
                   {official.sponsoredBills.length > 0 && (
                     <div className="mt-3 text-xs">
                       <div className="font-semibold text-slate-300 mb-1 flex items-center gap-1.5 font-mono">
@@ -357,13 +390,13 @@ export const DistrictPage: React.FC = () => {
                       {official.sponsoredBills.map((b, idx) => (
                         <div key={idx} className="flex items-center justify-between text-slate-300 py-0.5">
                           <span>
-                            <strong className="text-blue-400 font-mono">{b.billNumber}</strong>: {b.billTitle}
+                            <strong className="text-amber-400 font-mono">{b.billNumber}</strong>: {b.billTitle}
                           </span>
                           <a
                             href={b.officialUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-400 hover:underline shrink-0 ml-2"
+                            className="text-amber-400 hover:underline shrink-0 ml-2"
                           >
                             View Bill &rarr;
                           </a>
@@ -373,14 +406,13 @@ export const DistrictPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Footer Official Links */}
                 <div className="mt-5 pt-3 border-t flex flex-wrap items-center justify-between gap-2 text-xs" style={{ borderColor: '#2A2A2A' }}>
                   <div className="flex items-center gap-3">
                     <a
                       href={official.officialWebsite}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 font-medium inline-flex items-center gap-1"
+                      className="text-amber-400 hover:text-amber-300 font-medium inline-flex items-center gap-1"
                     >
                       <span>Official Office Website</span>
                       <ExternalLink className="w-3 h-3" />
@@ -405,7 +437,6 @@ export const DistrictPage: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 2: Verified Candidates Running */}
         {activeTab === 'candidates' && (
           <div className="space-y-4">
             <div
@@ -442,7 +473,7 @@ export const DistrictPage: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-1.5">
                         {cand.isIncumbent && (
-                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 bg-blue-950/60 text-blue-300 border border-blue-500/30 rounded">
+                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 bg-amber-950/60 text-amber-300 border border-amber-500/30 rounded">
                             Incumbent
                           </span>
                         )}
@@ -487,7 +518,7 @@ export const DistrictPage: React.FC = () => {
                       href={cand.campaignUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 font-medium inline-flex items-center gap-1"
+                      className="text-amber-400 hover:text-amber-300 font-medium inline-flex items-center gap-1"
                     >
                       <span>Campaign Website</span>
                       <ExternalLink className="w-3 h-3" />

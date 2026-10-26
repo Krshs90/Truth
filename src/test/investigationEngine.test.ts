@@ -41,7 +41,6 @@ describe('Investigation Engine - Pipeline Tests', () => {
     const result = await investigateClaim('Candidate XYZ received space alien campaign donations.');
     expect(result.claim.assessment.verdict).toBe('Unverified');
     expect(result.claim.assessment.supportingEvidence.length).toBe(0);
-    // Explicit rule: An unverified claim must never be automatically labeled false
     expect(result.claim.assessment.verdict).not.toBe('Contradicted by available evidence');
   });
 

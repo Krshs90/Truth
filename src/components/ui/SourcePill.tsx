@@ -48,7 +48,7 @@ export const SourcePill: React.FC<SourcePillProps> = ({
       }}
       title={`Open official source: ${title} (${url})`}
     >
-      <Icon className="w-3.5 h-3.5 text-blue-400 group-hover:text-blue-300 transition-colors shrink-0" />
+      <Icon className="w-3.5 h-3.5 text-amber-400 group-hover:text-amber-300 transition-colors shrink-0" />
       <span className="font-medium truncate max-w-[220px] text-slate-200">{title}</span>
       {publisher && (
         <span className="text-slate-400 hidden sm:inline">• {publisher}</span>
@@ -57,7 +57,7 @@ export const SourcePill: React.FC<SourcePillProps> = ({
         <span className="text-slate-500 text-[10px] hidden md:inline">({date})</span>
       )}
       {isPrimary && (
-        <span className="text-[9px] bg-blue-950/60 text-blue-300 border border-blue-500/30 px-1.5 py-0.5 rounded-full font-mono font-semibold">
+        <span className="text-[9px] bg-amber-950/60 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-mono font-semibold">
           PRIMARY
         </span>
       )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CivicProvider } from '../context/CivicContext';
@@ -12,6 +12,7 @@ import { ComparePage } from '../pages/ComparePage';
 import { GovernmentPage } from '../pages/GovernmentPage';
 import { SourcesPage } from '../pages/SourcesPage';
 import { SettingsPage } from '../pages/SettingsPage';
+import { MapPage } from '../pages/MapPage';
 import { OnboardingModal } from '../components/onboarding/OnboardingModal';
 
 function renderWithProviders(ui: React.ReactElement, initialRoute = '/') {
@@ -45,20 +46,19 @@ describe('UI Functional Integration Tests', () => {
     expect(screen.getByText(/Current Elected Officials/i)).toBeInTheDocument();
   });
 
-  it('Renders Investigate workspace with 4-step pipeline', () => {
+  it('Renders Investigate workspace with search console and curated library', () => {
     renderWithProviders(<InvestigatePage />);
     expect(screen.getByText('Investigate Political Claims')).toBeInTheDocument();
-    expect(screen.getByText('Extract Claims')).toBeInTheDocument();
-    expect(screen.getByText('Retrieve Evidence')).toBeInTheDocument();
-    expect(screen.getByText('Evaluate Evidence')).toBeInTheDocument();
-    expect(screen.getByText('Transparent Report')).toBeInTheDocument();
+    expect(screen.getByText(/Political Claim or Statement to Investigate/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Begin Investigation/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Civic Claims Library/i).length).toBeGreaterThan(0);
   });
 
   it('Renders Candidate Comparison matrix with issue dropdowns', () => {
     renderWithProviders(<ComparePage />);
     expect(screen.getByText('Compare Candidates on Documented Issues')).toBeInTheDocument();
-    expect(screen.getAllByText(/Ted Cruz/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Colin Allred/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Ken Paxton/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/James Talarico/i).length).toBeGreaterThan(0);
   });
 
   it('Renders Government Tracker with bill search and filters', () => {
@@ -82,11 +82,29 @@ describe('UI Functional Integration Tests', () => {
     expect(screen.getByRole('heading', { name: /Optional Local AI Inference/i })).toBeInTheDocument();
   });
 
-  it('Renders Onboarding modal with mission, district setup, and nonpartisan pledge', () => {
+  it('Renders Map page with spatial civic intelligence header and interactive division system', () => {
+    renderWithProviders(<MapPage />);
+    expect(screen.getByText('Texas Civic & Electoral Map')).toBeInTheDocument();
+    expect(screen.getByText(/Map Division:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Districts \(38\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Counties \(254\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Politicians \(12 Key\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/TX Senate \(31\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/None \(Standard Map\)/i)).toBeInTheDocument();
+  });
+
+  it('Renders Onboarding modal with mission, district setup, and nonpartisan pledge', async () => {
     renderWithProviders(<OnboardingModal isOpen={true} onClose={() => {}} />);
-    expect(screen.getByText('See beyond the political spin.')).toBeInTheDocument();
-    expect(screen.getByText('Strictly Nonpartisan')).toBeInTheDocument();
-    expect(screen.getByText('Primary Sources First')).toBeInTheDocument();
+    expect(screen.getAllByText(/TRUTH/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/the spin\./i)).toBeInTheDocument();
+    expect(screen.getByText(/Understand your candidates/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Begin/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /^Begin/i }));
+
+    expect(await screen.findByText('See beyond the political spin.')).toBeInTheDocument();
+    expect(screen.getByText(/Strictly Nonpartisan/i)).toBeInTheDocument();
+    expect(screen.getByText(/Primary Government Sources First/i)).toBeInTheDocument();
     expect(screen.getByText('Continue')).toBeInTheDocument();
   });
 });

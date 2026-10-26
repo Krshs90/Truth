@@ -1,189 +1,129 @@
-# Truth: A Texas-First Civic Intelligence Windows Desktop & Web App
+<p align="center">
+  <img src="docs/banner.png" alt="Truth - See beyond the spin" width="100%" />
+</p>
 
-> **Tagline:** *See beyond the spin.*  
-> **Core message:** *Understand your candidates. Investigate the claims. Decide for yourself.*
+<p align="center">
+  <b>See beyond the spin.</b><br/>
+  A nonpartisan, Texas-first civic research app that checks political claims against real government records.
+</p>
 
-**Truth** is a nonpartisan, evidence-based civic research platform built for Windows and the modern web, designed to help voters understand elections, investigate political statements, and verify claims against primary government records. Built for the **Congressional App Challenge**, Truth connects campaign advertisements and rhetoric directly to original Texas legislative journals, statutory bills, and official congressional roll-call votes.
+<p align="center">
+  <img alt="Congressional App Challenge" src="https://img.shields.io/badge/Congressional%20App%20Challenge-2026-1f6feb?style=for-the-badge" />
+  <img alt="Texas" src="https://img.shields.io/badge/Made%20in-Texas-bf0a30?style=for-the-badge" />
+  <img alt="Local AI" src="https://img.shields.io/badge/AI-100%25%20local%20(Ollama)-2ea043?style=for-the-badge" />
+</p>
 
----
-
-## Architecture & Whispr-Inspired UI Experience
-
-Truth's Windows desktop application and UI design language adopt the architectural and animation standards of **Whispr**:
-
-1. **Native Frameless Windows Desktop App (Electron)**:
-   - Custom draggable title bar (`-webkit-app-region: drag`) with live Glowing Orb system indicator.
-   - Native Windows desktop controls (`-webkit-app-region: no-drag`): Minimize, Maximize/Restore, and Close with danger red hover state (`#FF3B30`).
-   - Windows desktop launcher script (`scripts/launch-default-desktop.ps1`) executing into the interactive `WinSta0\Default` desktop station.
-   - Runs seamlessly both as a native Windows desktop app (`npm run electron:dev`) and as a web application (`npm run dev`).
-
-2. **Whispr Cyber-Editorial Visual Design**:
-   - Deep obsidian / carbon dark mode (`#141414` / `#1A1A1A`).
-   - Warm ivory typography (`#FFFFEB`) with high readability.
-   - Hairline architectural borders (`#2A2A2A` / `#31312F`).
-   - Slim custom 6px scrollbars (`thumb: #31312F`).
-
-3. **Spring Physics & Micro-Interactions (`framer-motion`)**:
-   - Route transitions with `<AnimatePresence mode="wait">` using natural spring dynamics (`{ type: "spring", stiffness: 380, damping: 28 }`).
-   - Card hover lifts (`whileHover={{ y: -2, borderColor: '#3A3A3A' }}`).
-   - Button tap scale feedback (`whileTap={{ scale: 0.97 }}`).
-
-4. **Floating Dynamic Civic Island**:
-   - A floating pill dock at the bottom of the screen featuring a live pulsing Glowing Orb indicator.
-   - Real-time active district display (e.g. `TX-37 • SD-14`).
-   - One-click spring expansion for instant political statement verification from anywhere in the app.
+<p align="center">
+  <img alt="React" src="https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=black" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white" />
+  <img alt="Vite" src="https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white" />
+  <img alt="Electron" src="https://img.shields.io/badge/Electron-desktop-47848f?logo=electron&logoColor=white" />
+  <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind-4-06b6d4?logo=tailwindcss&logoColor=white" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-37%20passing-2ea043" />
+  <img alt="No API keys" src="https://img.shields.io/badge/API%20keys-none%20needed-8957e5" />
+</p>
 
 ---
 
-## Key Features
+## Why I built this
 
-1. **Onboarding Setup Wizard**:
-   - First-time interactive modal introducing the nonpartisan charter, Texas district selection, and local AI engine preferences.
-   - Re-openable anytime via the "District Setup" badge in the top bar.
+Election season is loud. Ads say a bill "raised your taxes" or "protected the border," and it's hard to tell what's true without digging through legislative journals most people have never opened.
 
-2. **My District (`/district`)**:
-   - Personalized civic intelligence for U.S. Congressional, Texas Senate, and Texas House districts.
-   - ZIP-based geographic mapping with explicit electoral disclaimers (recognizing that ZIP codes in Texas frequently span multiple legislative boundaries).
-   - First-class manual district selectors for full user control without requiring a home address.
-   - Comprehensive profiles of current elected officials and verified candidates, featuring documented voting records and sponsored bills.
+I wanted a tool that does the digging for you, without telling you who to vote for. **Truth** lets you paste a claim, an ad transcript, or a link to an article. It then lines the claim up against the actual bills, votes, and public records, and shows its work. It never uses a "trust me" verdict. If there's no evidence either way, it says so.
 
-3. **Claim Investigation Workspace (`/investigate` & `/investigate/:id`)**:
-   - Auditable, 4-step evidential pipeline:
-     1. **Extract Claims:** Decomposes input into individual assertions, distinguishing factual claims from future predictions, opinions, and value judgments.
-     2. **Retrieve Evidence:** Scans indexed collections of primary statutes, legislative journals, and nonpartisan fact-checks.
-     3. **Evaluate Evidence:** Assesses statutory scope, jurisdiction, timeline, and potential omissions.
-     4. **Transparent Dossier:** Produces a 10-point dossier linking every assertion to verified primary source documents.
-   - 7 analytical verdict categories (e.g., *Supported by evidence*, *Misleading or missing important context*, *Unverified*, *Opinion or prediction*).
-   - Support for plain text claims, full political ad transcripts, SSRF-protected public URL article extraction, and a pre-researched Texas claims catalog.
+## What it does
 
-4. **Candidate Comparison Matrix (`/compare`)**:
-   - Side-by-side comparison of candidates across key Texas policy areas: Education & Vouchers, Taxes & Spending, Border Security, Healthcare & Medicaid, Energy & Grid Reliability, and Reproductive Rights.
-   - Strict adherence to documented records: distinguishes *Documented Legislative Action* and *Public Stated Position* from *Insufficient Public Record*.
-   - Never calculates partisan scores, popularity rankings, or recommendations on who to vote for.
+| Feature | What you get |
+| --- | --- |
+| **Claim Investigation** | Paste a claim, ad, or URL. Truth splits it into individual assertions, finds matching records, and explains what the evidence does and doesn't support. |
+| **My District** | Enter a ZIP or pick your U.S. House, Texas Senate, and Texas House districts to see your officials and candidates. |
+| **Compare Candidates** | Side-by-side positions on education, taxes, the border, healthcare, energy, and more. It only shows documented actions and statements, with no scores and no endorsements. |
+| **Government Tracker** | Searchable Texas Legislature and Congress bills, with clear status labels so an introduced bill is never passed off as law. |
+| **Interactive Texas Map** | Explore districts and counties, and see how areas voted. |
+| **Sources & Methodology** | Every source, how it's ranked, and when it was last checked. |
+| **Civic Island** | A floating bar that lets you check a statement from anywhere in the app. |
+| **Local AI Assistant** | Ask questions in plain English. Answers are grounded in the evidence on screen. |
 
-5. **Government & Legislative Tracker (`/government`)**:
-   - Searchable legislative database covering enacted statutes, failed amendments, and pending proposals from the Texas Legislature (87th & 88th sessions) and U.S. Congress.
-   - Distinct statuses (*Enacted*, *Failed*, *Passed Chamber*, *In Committee*, *Introduced*) ensuring introduced bills are never mischaracterized as law.
-   - Detailed roll-call breakdowns with individual representative votes and links to official legislative journals.
+## How it stays honest
 
-6. **Sources & Methodology (`/sources`)**:
-   - Comprehensive explanation of evidence hierarchy (primary statutory archives vs. secondary reporting).
-   - Complete directory of trusted sources with reliability notes and last-checked dates.
-   - Full record-level **Data Provenance & Audit Log** documenting retrieval timestamps, verification methods, and public access terms.
-   - Public correction submission interface.
+- **No keyword "fact-checking."** Live news headlines are labelled *Unchecked* until they are actually reviewed. Nothing is stamped "true" or "false" because of a word in the title.
+- **Evidence-grounded AI.** The model is told to use only the retrieved records and to say "unverified" when the records don't cover a claim.
+- **Nothing fabricated.** A missing source never produces an invented link or citation.
+- **Non-partisan by design.** Positions are never inferred from party, and Truth never recommends a candidate.
+- **Private by default.** There are no accounts, no tracking, and no analytics. Your district choice stays in your browser's local storage.
+- **Safe link reader.** The article reader blocks requests to private, loopback, and cloud-metadata addresses, and re-checks every redirect.
 
-7. **Settings & Privacy Controls (`/settings`)**:
-   - Zero user profiling: no login, no email, no address tracking.
-   - District selections stored exclusively in client-side HTML5 LocalStorage.
-   - Optional local Ollama inference configuration for fully offline, zero-cloud natural language summaries.
+## Run it
 
----
+### Download (Windows)
 
-## Technology Stack
+Grab **`Truth-V1-win-x64.zip`** from the [latest release](https://github.com/Krshs90/Truth/releases/latest), unzip it, and double-click `Truth.exe`. No install and no accounts are needed. The app isn't code-signed, so Windows SmartScreen may warn you the first time. Click **More info → Run anyway**.
 
-- **Desktop Framework:** Electron v45, frameless custom window title bar
-- **Frontend:** React 19, TypeScript (strict mode), Vite
-- **Styling:** Tailwind CSS v4, Lucide Icons, Whispr Deep Obsidian Dark Theme
-- **Animations:** Framer Motion v14 (spring physics: `stiffness: 380, damping: 28`)
-- **Routing:** React Router v7 with animated `<AnimatePresence>` transitions
-- **State & Data Management:** TanStack Query v5, React Context API, LocalStorage persistence
-- **Backend / Proxy (Optional):** Node.js / Express with SSRF-safe URL reader and local Ollama proxy
-- **Testing & Quality Assurance:** Vitest, React Testing Library, `@testing-library/jest-dom/vitest`, jsdom, Playwright
+### From source
 
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v18 or higher recommended; developed and tested on Node v24)
-- npm (v9 or higher)
-
-### Installation
-
-Clone the repository and install dependencies:
+You need [Node.js](https://nodejs.org/) 18+. No API keys, accounts, or paid services are required.
 
 ```bash
-cd "Truth - CAC"
+git clone https://github.com/Krshs90/Truth.git
+cd Truth
 npm install
 ```
 
-### Running the Application
+**Web app**
+```bash
+npm run dev          # http://127.0.0.1:5173
+```
 
-Truth is designed to run locally with zero API keys and zero cost.
-
-#### Option A: Windows Desktop Application (Recommended)
-Spawns the local backend, Vite bundler, and native frameless Electron desktop app:
-
+**Desktop app (Windows)**
 ```bash
 npm run electron:dev
 ```
 
-#### Option B: Web Browser Development Mode
-Runs the complete client-side application with deterministic civic intelligence engine in your browser:
-
-```bash
-npm run dev
-```
-
-Open `http://localhost:5173` in your web browser.
-
-#### Option C: Full Stack Mode (Web + Backend Proxy)
-Runs both the Vite frontend and Express backend proxy concurrently:
-
+**Full stack (separate Express backend)**
 ```bash
 npm run start:all
 ```
 
-- Client: `http://localhost:5173`
-- Backend API: `http://localhost:3001`
-
----
-
-## Running the Automated Test Suite
-
-Truth includes 29 automated unit, integration, and evidence-integrity tests:
-
+**Build the Windows executable yourself**
 ```bash
-npm run test
+npm run package:win   # outputs release/Truth-win32-x64/Truth.exe
 ```
 
-### Running Production Build Verification
+### Optional: turn on the local AI
 
-```bash
-npm run build
+1. Install [Ollama](https://ollama.com/download) and pull a model, for example `ollama pull llama3.2`.
+2. Open **Settings** in Truth (or the setup wizard) and enable Ollama.
+3. Everything runs on your own machine. Nothing is sent to the cloud.
+
+If Ollama isn't running, Truth falls back to its built-in evidence matching and still works.
+
+## Under the hood
+
+```
+src/            React app: pages, components, services, curated data
+server/         Express + Vite dev API: AI proxy, safe URL reader, live news sync
+electron/       Desktop shell
+scripts/        Data-building helpers
 ```
 
-The production bundle will be built into the `dist/` folder with route-based code splitting.
+Built with React 19, TypeScript, Vite, Tailwind CSS 4, Framer Motion, React Router, TanStack Query, Leaflet, Express, Electron, and Vitest.
 
----
+```bash
+npm test            # unit + integration tests
+npm run build       # type-check and production build
+npm run lint
+```
 
-## Evidence Integrity Guarantees
+## Sources
 
-As required by Section 15 of the specification, the test suite verifies that:
-1. **Unverified Claims:** An unsupported claim is never automatically labeled false without contradictory evidence.
-2. **Zero Hallucination:** A missing source never produces a fabricated URL or citation.
-3. **Statutory Accuracy:** An introduced bill is never presented as enacted law.
-4. **Attribution:** No roll-call vote is attributed to an official without an official journal source link.
-5. **Nonpartisanship:** Candidate positions are never inferred from political party affiliation.
-6. **Citation Integrity:** Every factual assertion in an investigation links to an existing evidence record.
-7. **Nuance:** Conflicting records trigger explicit missing context explanations.
-8. **Provenance:** Source publication dates are strictly distinguished from retrieval timestamps.
-9. **Transparency:** AI-assisted outputs are labeled distinctly from primary source records.
+Records come from public government publications: [Texas Legislature Online](https://capitol.texas.gov/), [Congress.gov](https://www.congress.gov/), the Texas Secretary of State, and official court and agency sites. Live headlines come from public news RSS feeds and are always marked as unchecked reporting, not verified fact.
 
----
+## Known limitations
 
-## Optional Local AI Inference (Ollama)
+- Coverage is Texas-only, and the curated claim library is hand-built, so it is not exhaustive.
+- Some archived source links may have moved since they were collected. If you find a broken one, please open an issue.
+- ZIP codes can span several districts, so Truth shows a best match and lets you choose your district manually.
 
-Truth requires **no paid APIs** (OpenAI, Anthropic, or Gemini). If you have [Ollama](https://ollama.com/) installed locally:
-1. Start Ollama: `ollama run llama3`
-2. Navigate to **Settings** (`/settings`) or use Step 3 of the **District Setup Wizard**.
-3. Check **Enable Local Ollama for grounded claim summaries**.
-4. Test the connection. When active, Ollama summarizes verified evidence using strict grounded constraints.
-5. If Ollama is offline or unavailable, Truth automatically falls back to its deterministic rule-based engine with zero degradation of core functionality.
+## About
 
----
-
-## License & Attribution
-
-Developed as a demonstration civic intelligence platform for the Congressional App Challenge. All statutory texts and legislative records are sourced from public domain government publications of the State of Texas (Texas Legislature Online) and the United States Government (Congress.gov).
+Built for the **Congressional App Challenge**. Truth is a research aid. Always read the primary sources and make up your own mind.

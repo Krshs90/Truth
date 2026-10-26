@@ -1,11 +1,9 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 
-// Prevent renderer sandbox process crashes on Windows while keeping DWM transparency compositing enabled
 app.commandLine.appendSwitch('disable-gpu-sandbox');
 app.commandLine.appendSwitch('no-sandbox');
 
-// Production safety: Global error handlers
 process.on('uncaughtException', (err) => {
   console.error('[Truth Fatal] Uncaught exception:', err);
 });
@@ -14,6 +12,7 @@ process.on('unhandledRejection', (reason) => {
 });
 
 let mainWindow = null;
+let packagedUrl = '';
 const isDev = !app.isPackaged;
 
 function createMainWindow() {
@@ -31,6 +30,7 @@ function createMainWindow() {
     frame: false,
     titleBarStyle: 'hidden',
     backgroundColor: '#141414',
+    icon: path.join(__dirname, 'icon.ico'),
     show: true,
     center: true,
     webPreferences: {
@@ -58,7 +58,6 @@ function createMainWindow() {
     revealWindow();
   });
 
-  // Guarantee window visibility after timeout
   setTimeout(revealWindow, 1200);
 
   if (isDev) {
@@ -66,7 +65,7 @@ function createMainWindow() {
     console.log(`[Truth Desktop] Loading dev URL: ${devUrl}`);
     mainWindow.loadURL(devUrl);
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    mainWindow.loadURL(packagedUrl);
   }
 
   mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription) => {
@@ -92,7 +91,6 @@ function createMainWindow() {
   });
 }
 
-// Frameless window control IPC
 ipcMain.on('window-minimize', () => {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.minimize();
@@ -128,7 +126,16 @@ ipcMain.on('open-external', (_event, url) => {
   }
 });
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  if (!isDev) {
+    process.env.TRUTH_DATA_DIR = app.getPath('userData');
+    const { startAppServer } = require('./appServer.cjs');
+    const { port } = await startAppServer(
+      path.join(__dirname, '../dist'),
+      path.join(__dirname, 'apiServer.bundle.cjs')
+    );
+    packagedUrl = `http://127.0.0.1:${port}`;
+  }
   createMainWindow();
 
   app.on('activate', () => {

@@ -1,9 +1,9 @@
 import { Official } from '../types';
 
 export const OFFICIALS: Official[] = [
-  // ==================== U.S. SENATE (TEXAS STATEWIDE) ====================
   {
     id: 'off-fed-cruz',
+    photoUrl: '/images/officials/off-fed-cruz.jpg',
     name: 'Ted Cruz',
     office: 'U.S. Senator for Texas',
     jurisdiction: 'Federal',
@@ -56,6 +56,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-cornyn',
+    photoUrl: '/images/officials/off-fed-cornyn.jpg',
     name: 'John Cornyn',
     office: 'U.S. Senator for Texas',
     jurisdiction: 'Federal',
@@ -94,9 +95,9 @@ export const OFFICIALS: Official[] = [
     lastVerifiedAt: '2024-11-15',
   },
 
-  // ==================== TEXAS EXECUTIVE (STATEWIDE) ====================
   {
     id: 'off-txgov-abbott',
+    photoUrl: '/images/officials/off-txgov-abbott.jpg',
     name: 'Greg Abbott',
     office: 'Governor of Texas',
     jurisdiction: 'Texas Executive',
@@ -114,6 +115,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txgov-patrick',
+    photoUrl: '/images/officials/off-txgov-patrick.jpg',
     name: 'Dan Patrick',
     office: 'Lieutenant Governor of Texas',
     jurisdiction: 'Texas Executive',
@@ -131,6 +133,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txgov-paxton',
+    photoUrl: '/images/officials/off-txgov-paxton.jpg',
     name: 'Ken Paxton',
     office: 'Attorney General of Texas',
     jurisdiction: 'Texas Executive',
@@ -146,10 +149,215 @@ export const OFFICIALS: Official[] = [
     sponsoredBills: [],
     lastVerifiedAt: '2024-11-15',
   },
+  {
+    id: 'off-txexec-hegar',
+    photoUrl: '/images/officials/off-txexec-hegar.jpg',
+    name: 'Glenn Hegar',
+    office: 'Comptroller of Public Accounts of Texas',
+    jurisdiction: 'Texas Executive',
+    district: 'Statewide (Texas)',
+    party: 'Republican',
+    officialWebsite: 'https://comptroller.texas.gov/',
+    officialProfileUrl: 'https://comptroller.texas.gov/about/hegar/',
+    officeAddress: 'Lyndon B. Johnson State Office Building, 111 E. 17th St, Austin, TX 78774',
+    phone: '(512) 463-4000',
+    termExpires: 'January 2027',
+    bioSummary: 'Serving as Texas Comptroller of Public Accounts since 2015. Chief financial officer of Texas, responsible for constitutional revenue estimates, state tax collections, and administration of the Texas Energy Fund and Broadband Development Office.',
+    recentVotes: [],
+    sponsoredBills: [],
+    lastVerifiedAt: '2026-10-24',
+  },
+  {
+    id: 'off-txexec-miller',
+    photoUrl: '/images/officials/off-txexec-miller.jpg',
+    name: 'Sid Miller',
+    office: 'Commissioner of Agriculture of Texas',
+    jurisdiction: 'Texas Executive',
+    district: 'Statewide (Texas)',
+    party: 'Republican',
+    officialWebsite: 'https://www.texasagriculture.gov/',
+    officialProfileUrl: 'https://www.texasagriculture.gov/About/Commissioner-Miller',
+    officeAddress: '1700 N. Congress Ave, 11th Floor, Austin, TX 78701',
+    phone: '(512) 463-7476',
+    termExpires: 'January 2027',
+    bioSummary: 'Serving as Texas Agriculture Commissioner since 2015. Former 12-year member of the Texas House of Representatives. Oversees consumer protection, weights and measures, school nutrition programs, agricultural trade promotion, and border livestock inspections.',
+    recentVotes: [],
+    sponsoredBills: [],
+    lastVerifiedAt: '2026-10-24',
+  },
+  {
+    id: 'off-txexec-craddick',
+    photoUrl: '/images/officials/off-txexec-craddick.jpg',
+    name: 'Christi Craddick',
+    office: 'Chairman, Railroad Commission of Texas',
+    jurisdiction: 'Texas Executive',
+    district: 'Statewide (Texas)',
+    party: 'Republican',
+    officialWebsite: 'https://www.rrc.texas.gov/',
+    officialProfileUrl: 'https://www.rrc.texas.gov/about-us/commissioners/craddick/',
+    officeAddress: '1701 N Congress Ave, Austin, TX 78701',
+    phone: '(512) 463-7140',
+    termExpires: 'January 2031 (Re-elected Nov 2024)',
+    bioSummary: 'Serving on the Railroad Commission of Texas since 2012. Regulates the Texas oil and gas industry, pipeline safety, natural gas utilities, and surface coal and uranium mining.',
+    recentVotes: [],
+    sponsoredBills: [],
+    lastVerifiedAt: '2026-10-24',
+  },
+  {
+    id: 'off-txexec-buckingham',
+    photoUrl: '/images/officials/off-txexec-buckingham.jpg',
+    name: 'Dawn Buckingham',
+    office: 'Commissioner of the General Land Office of Texas',
+    jurisdiction: 'Texas Executive',
+    district: 'Statewide (Texas)',
+    party: 'Republican',
+    officialWebsite: 'https://www.glo.texas.gov/',
+    officialProfileUrl: 'https://www.glo.texas.gov/the-glo/about/commissioner/index.html',
+    officeAddress: '1700 N Congress Ave, Austin, TX 78701',
+    phone: '(512) 463-5001',
+    termExpires: 'January 2027',
+    bioSummary: 'First woman elected Texas Land Commissioner (2022). Former Texas State Senator for District 24 (2017-2023) and oculoplastic surgeon. Oversees the Alamo complex, Permanent School Fund mineral assets, coastal erosion protection, and state disaster recovery grants.',
+    recentVotes: [],
+    sponsoredBills: [],
+    lastVerifiedAt: '2026-10-24',
+  },
 
-  // ==================== U.S. HOUSE OF REPRESENTATIVES (TEXAS DELEGATION) ====================
+  {
+    id: 'off-txjud-blacklock',
+    photoUrl: '/images/officials/off-txjud-blacklock.jpg',
+    name: 'Jimmy Blacklock',
+    office: 'Justice, Supreme Court of Texas (Place 2)',
+    jurisdiction: 'Texas Judicial',
+    district: 'Statewide (Texas Supreme Court)',
+    party: 'Republican',
+    officialWebsite: 'https://www.txcourts.gov/supreme/',
+    officialProfileUrl: 'https://www.txcourts.gov/supreme/about-the-court/justices/justice-jimmy-blacklock/',
+    officeAddress: 'Supreme Court Building, 201 W. 14th St, Austin, TX 78701',
+    phone: '(512) 463-1312',
+    termExpires: 'December 2030 (Re-elected Nov 2024)',
+    bioSummary: 'Appointed to the Supreme Court of Texas in January 2018 by Governor Greg Abbott; elected statewide in 2018 and re-elected in 2024. Former General Counsel to Governor Abbott and Assistant Attorney General. Landmark opinions include constitutional statutory scope of state executive emergency powers under the Texas Disaster Act (In re Abbott), local election administration and mail-in ballot procedures under the Texas Election Code (State v. Hollins), and procedural limits on civil contempt.',
+    recentVotes: [
+      {
+        billNumber: 'No. 20-0291',
+        billTitle: 'In re Greg Abbott, Governor of Texas (Executive Disaster Authority)',
+        vote: 'Yea',
+        voteDate: '2020-04-23',
+        sourceUrl: 'https://www.txcourts.gov/supreme/',
+      },
+      {
+        billNumber: 'No. 20-0729',
+        billTitle: 'State of Texas v. Chris Hollins (Texas Election Code Ballot Procedures)',
+        vote: 'Yea',
+        voteDate: '2020-10-07',
+        sourceUrl: 'https://www.txcourts.gov/supreme/',
+      },
+      {
+        billNumber: 'No. 23-0994',
+        billTitle: 'State of Texas v. Zurawski (Texas Human Life Protection Act Medical Exceptions)',
+        vote: 'Yea',
+        voteDate: '2024-05-31',
+        sourceUrl: 'https://www.txcourts.gov/supreme/',
+      },
+    ],
+    sponsoredBills: [],
+    lastVerifiedAt: '2026-10-24',
+  },
+  {
+    id: 'off-txjud-hecht',
+    photoUrl: '/images/officials/off-txjud-hecht.jpg',
+    name: 'Nathan L. Hecht',
+    office: 'Chief Justice, Supreme Court of Texas',
+    jurisdiction: 'Texas Judicial',
+    district: 'Statewide (Texas Supreme Court)',
+    party: 'Republican',
+    officialWebsite: 'https://www.txcourts.gov/supreme/',
+    officialProfileUrl: 'https://www.txcourts.gov/supreme/about-the-court/justices/chief-justice-nathan-l-hecht/',
+    officeAddress: 'Supreme Court Building, 201 W. 14th St, Austin, TX 78701',
+    phone: '(512) 463-1312',
+    termExpires: 'December 2026',
+    bioSummary: 'Chief Justice of the Supreme Court of Texas since 2013 and member of the Court since 1989. Longest-serving justice in Texas Supreme Court history. Former President of the national Conference of Chief Justices. Championed electronic filing in Texas courts and indigent access to civil justice.',
+    recentVotes: [
+      {
+        billNumber: 'No. 20-0729',
+        billTitle: 'State of Texas v. Chris Hollins (Texas Election Code Procedures)',
+        vote: 'Yea',
+        voteDate: '2020-10-07',
+        sourceUrl: 'https://www.txcourts.gov/supreme/',
+      },
+    ],
+    sponsoredBills: [],
+    lastVerifiedAt: '2026-10-24',
+  },
+  {
+    id: 'off-txjud-bland',
+    photoUrl: '/images/officials/off-txjud-bland.jpg',
+    name: 'Jane Bland',
+    office: 'Justice, Supreme Court of Texas (Place 6)',
+    jurisdiction: 'Texas Judicial',
+    district: 'Statewide (Texas Supreme Court)',
+    party: 'Republican',
+    officialWebsite: 'https://www.txcourts.gov/supreme/',
+    officialProfileUrl: 'https://www.txcourts.gov/supreme/about-the-court/justices/justice-jane-bland/',
+    officeAddress: 'Supreme Court Building, 201 W. 14th St, Austin, TX 78701',
+    phone: '(512) 463-1312',
+    termExpires: 'December 2030 (Re-elected Nov 2024)',
+    bioSummary: 'Appointed to the Supreme Court of Texas in 2019 by Governor Abbott and elected statewide in 2020 and 2024. Previously served 15 years on the First Court of Appeals in Houston. Chairs the Judicial Commission on Mental Health.',
+    recentVotes: [
+      {
+        billNumber: 'No. 23-0994',
+        billTitle: 'State of Texas v. Zurawski (Texas Statutory Medical Exception Construction)',
+        vote: 'Yea',
+        voteDate: '2024-05-31',
+        sourceUrl: 'https://www.txcourts.gov/supreme/',
+      },
+    ],
+    sponsoredBills: [],
+    lastVerifiedAt: '2026-10-24',
+  },
+
+    {
+    id: 'off-fed-gill',
+    photoUrl: '/images/officials/off-fed-gill.jpg',
+    name: 'Brandon Gill',
+    office: 'U.S. Representative (TX-26)',
+    jurisdiction: 'Federal',
+    district: 'U.S. Congressional District 26 (Denton, Cooke, Wise)',
+    party: 'Republican',
+    officialWebsite: 'https://gill.house.gov/',
+    officialProfileUrl: 'https://www.congress.gov/member/brandon-gill/G000603',
+    officeAddress: 'Longworth House Office Building, Washington, DC 20515',
+    phone: '(202) 225-7772',
+    termExpires: 'January 2027 (119th Congress)',
+    bioSummary: 'Elected in November 2024 to represent Texas\'s 26th Congressional District encompassing Denton, Wise, and Cooke counties in the 119th Congress. Conservative news founder and member of the House Freedom Caucus. Prioritizes border enforcement, eliminating illegal immigrant federal benefits, balancing the federal budget, and domestic energy production.',
+    recentVotes: [
+      {
+        billNumber: 'H.R. 2',
+        billTitle: 'Secure the Border Act of 2023',
+        vote: 'Yea',
+        voteDate: '2023-05-11',
+        sourceUrl: 'https://clerk.house.gov/Votes/2023209',
+      },
+      {
+        billNumber: 'H.R. 3684',
+        billTitle: 'Infrastructure Investment and Jobs Act',
+        vote: 'Nay',
+        voteDate: '2021-11-05',
+        sourceUrl: 'https://clerk.house.gov/Votes/2021369',
+      },
+    ],
+    sponsoredBills: [
+      {
+        billNumber: 'H.R. 10268',
+        billTitle: 'Restricting Federal SNAP & Welfare Benefits for Non-Citizens',
+        status: 'Introduced',
+        officialUrl: 'https://www.congress.gov/',
+      },
+    ],
+    lastVerifiedAt: '2026-10-24',
+  },
   {
     id: 'off-fed-doggett',
+    photoUrl: '/images/officials/off-fed-doggett.jpg',
     name: 'Lloyd Doggett',
     office: 'U.S. Representative (TX-37)',
     jurisdiction: 'Federal',
@@ -196,6 +404,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-roy',
+    photoUrl: '/images/officials/off-fed-roy.jpg',
     name: 'Chip Roy',
     office: 'U.S. Representative (TX-21)',
     jurisdiction: 'Federal',
@@ -242,6 +451,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-allred',
+    photoUrl: '/images/officials/off-fed-allred.jpg',
     name: 'Colin Allred',
     office: 'U.S. Representative (TX-32)',
     jurisdiction: 'Federal',
@@ -288,6 +498,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-casar',
+    photoUrl: '/images/officials/off-fed-casar.jpg',
     name: 'Greg Casar',
     office: 'U.S. Representative (TX-35)',
     jurisdiction: 'Federal',
@@ -320,6 +531,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-mccaul',
+    photoUrl: '/images/officials/off-fed-mccaul.jpg',
     name: 'Michael McCaul',
     office: 'U.S. Representative (TX-10)',
     jurisdiction: 'Federal',
@@ -359,6 +571,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-crenshaw',
+    photoUrl: '/images/officials/off-fed-crenshaw.jpg',
     name: 'Dan Crenshaw',
     office: 'U.S. Representative (TX-02)',
     jurisdiction: 'Federal',
@@ -391,6 +604,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-fletcher',
+    photoUrl: '/images/officials/off-fed-fletcher.jpg',
     name: 'Lizzie Fletcher',
     office: 'U.S. Representative (TX-07)',
     jurisdiction: 'Federal',
@@ -423,6 +637,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-crockett',
+    photoUrl: '/images/officials/off-fed-crockett.jpg',
     name: 'Jasmine Crockett',
     office: 'U.S. Representative (TX-30)',
     jurisdiction: 'Federal',
@@ -455,6 +670,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-escobar',
+    photoUrl: '/images/officials/off-fed-escobar.jpg',
     name: 'Veronica Escobar',
     office: 'U.S. Representative (TX-16)',
     jurisdiction: 'Federal',
@@ -487,6 +703,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-gonzales',
+    photoUrl: '/images/officials/off-fed-gonzales.jpg',
     name: 'Tony Gonzales',
     office: 'U.S. Representative (TX-23)',
     jurisdiction: 'Federal',
@@ -519,6 +736,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-cuellar',
+    photoUrl: '/images/officials/off-fed-cuellar.jpg',
     name: 'Henry Cuellar',
     office: 'U.S. Representative (TX-28)',
     jurisdiction: 'Federal',
@@ -551,6 +769,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-fed-granger',
+    photoUrl: '/images/officials/off-fed-granger.jpg',
     name: 'Kay Granger',
     office: 'U.S. Representative (TX-12)',
     jurisdiction: 'Federal',
@@ -575,9 +794,9 @@ export const OFFICIALS: Official[] = [
     lastVerifiedAt: '2024-11-15',
   },
 
-  // ==================== TEXAS STATE SENATE ====================
   {
     id: 'off-txsen-eckhardt',
+    photoUrl: '/images/officials/off-txsen-eckhardt.jpg',
     name: 'Sarah Eckhardt',
     office: 'Texas State Senator (District 14)',
     jurisdiction: 'Texas Senate',
@@ -617,6 +836,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txsen-campbell',
+    photoUrl: '/images/officials/off-txsen-campbell.jpg',
     name: 'Donna Campbell',
     office: 'Texas State Senator (District 25)',
     jurisdiction: 'Texas Senate',
@@ -656,6 +876,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txsen-cook',
+    photoUrl: '/images/officials/off-txsen-cook.jpg',
     name: 'Molly Cook',
     office: 'Texas State Senator (District 15)',
     jurisdiction: 'Texas Senate',
@@ -673,6 +894,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txsen-johnson',
+    photoUrl: '/images/officials/off-txsen-johnson.jpg',
     name: 'Nathan Johnson',
     office: 'Texas State Senator (District 16)',
     jurisdiction: 'Texas Senate',
@@ -705,6 +927,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txsen-bettencourt',
+    photoUrl: '/images/officials/off-txsen-bettencourt.jpg',
     name: 'Paul Bettencourt',
     office: 'Texas State Senator (District 7)',
     jurisdiction: 'Texas Senate',
@@ -737,6 +960,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txsen-west',
+    photoUrl: '/images/officials/off-txsen-west.jpg',
     name: 'Royce West',
     office: 'Texas State Senator (District 23)',
     jurisdiction: 'Texas Senate',
@@ -762,6 +986,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txsen-blanco',
+    photoUrl: '/images/officials/off-txsen-blanco.jpg',
     name: 'César Blanco',
     office: 'Texas State Senator (District 29)',
     jurisdiction: 'Texas Senate',
@@ -787,6 +1012,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txsen-schwertner',
+    photoUrl: '/images/officials/off-txsen-schwertner.jpg',
     name: 'Charles Schwertner',
     office: 'Texas State Senator (District 5)',
     jurisdiction: 'Texas Senate',
@@ -818,9 +1044,50 @@ export const OFFICIALS: Official[] = [
     lastVerifiedAt: '2024-11-15',
   },
 
-  // ==================== TEXAS STATE HOUSE OF REPRESENTATIVES ====================
+    {
+    id: 'off-txsen-parker',
+    photoUrl: '/images/officials/off-txsen-parker.jpg',
+    name: 'Tan Parker',
+    office: 'Texas State Senator (District 12)',
+    jurisdiction: 'Texas Senate',
+    district: 'Senate District 12 (Denton, Tarrant & Wise Counties)',
+    party: 'Republican',
+    officialWebsite: 'https://senate.texas.gov/member.php?d=12',
+    officialProfileUrl: 'https://capitol.texas.gov/Members/MemberInfo.aspx?Leg=88&Chamber=S&Code=A1205',
+    officeAddress: 'Capitol Extension, Room E1.712, Austin, TX 78701',
+    phone: '(512) 463-0112',
+    termExpires: 'January 2027',
+    bioSummary: 'Serving Senate District 12 since 2023; previously served in the Texas House (2007-2023) representing District 63. Former Chair of Texas House Investments & Financial Services. Focuses on economic competitiveness, infrastructure, parental empowerment in education, and public safety.',
+    recentVotes: [
+      {
+        billNumber: 'TX 88(2C) SB 2',
+        billTitle: 'Property Tax Relief Act',
+        vote: 'Yea',
+        voteDate: '2023-07-12',
+        sourceUrl: 'https://journals.senate.texas.gov/sjrnl/882/pdf/88S2SJ07-12-F.PDF',
+      },
+      {
+        billNumber: 'TX 88(4C) SB 4',
+        billTitle: 'Illegal Border Entry State Enforcement',
+        vote: 'Yea',
+        voteDate: '2023-11-14',
+        sourceUrl: 'https://journals.senate.texas.gov/sjrnl/884/pdf/88S4SJ11-14-F.PDF',
+      },
+    ],
+    sponsoredBills: [
+      {
+        billNumber: 'SB 1057',
+        billTitle: 'Project Financing and Economic Development Zones',
+        status: 'Enacted',
+        officialUrl: 'https://capitol.texas.gov/BillLookup/History.aspx?LegSess=88R&Bill=SB1057',
+      },
+    ],
+    lastVerifiedAt: '2024-11-15',
+  },
+
   {
     id: 'off-txrep-hinojosa',
+    photoUrl: '/images/officials/off-txrep-hinojosa.jpg',
     name: 'Gina Hinojosa',
     office: 'Texas State Representative (District 49)',
     jurisdiction: 'Texas House',
@@ -860,6 +1127,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-cole',
+    photoUrl: '/images/officials/off-txrep-cole.jpg',
     name: 'Sheryl Cole',
     office: 'Texas State Representative (District 46)',
     jurisdiction: 'Texas House',
@@ -885,6 +1153,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-bucy',
+    photoUrl: '/images/officials/off-txrep-bucy.jpg',
     name: 'John Bucy III',
     office: 'Texas State Representative (District 136)',
     jurisdiction: 'Texas House',
@@ -910,6 +1179,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-isaac',
+    photoUrl: '/images/officials/off-txrep-isaac.jpg',
     name: 'Carrie Isaac',
     office: 'Texas State Representative (District 73)',
     jurisdiction: 'Texas House',
@@ -935,6 +1205,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-meyer',
+    photoUrl: '/images/officials/off-txrep-meyer.jpg',
     name: 'Morgan Meyer',
     office: 'Texas State Representative (District 108)',
     jurisdiction: 'Texas House',
@@ -960,6 +1231,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-johnson',
+    photoUrl: '/images/officials/off-txrep-johnson.jpg',
     name: 'Ann Johnson',
     office: 'Texas State Representative (District 134)',
     jurisdiction: 'Texas House',
@@ -985,6 +1257,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-phelan',
+    photoUrl: '/images/officials/off-txrep-phelan.jpg',
     name: 'Dade Phelan',
     office: 'Speaker of the Texas House (District 21)',
     jurisdiction: 'Texas House',
@@ -1002,6 +1275,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-moody',
+    photoUrl: '/images/officials/off-txrep-moody.jpg',
     name: 'Joe Moody',
     office: 'Texas State Representative (District 77)',
     jurisdiction: 'Texas House',
@@ -1027,6 +1301,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-burrows',
+    photoUrl: '/images/officials/off-txrep-burrows.jpg',
     name: 'Dustin Burrows',
     office: 'Texas State Representative (District 83)',
     jurisdiction: 'Texas House',
@@ -1052,6 +1327,7 @@ export const OFFICIALS: Official[] = [
   },
   {
     id: 'off-txrep-romero',
+    photoUrl: '/images/officials/off-txrep-romero.jpg',
     name: 'Ramon Romero Jr.',
     office: 'Texas State Representative (District 90)',
     jurisdiction: 'Texas House',
@@ -1074,5 +1350,71 @@ export const OFFICIALS: Official[] = [
     ],
     sponsoredBills: [],
     lastVerifiedAt: '2024-11-15',
+  },
+  {
+    id: 'off-txhouse-talarico',
+    photoUrl: '/images/officials/off-txhouse-talarico.jpg',
+    name: 'James Talarico',
+    office: 'Texas State Representative (District 50)',
+    jurisdiction: 'Texas House',
+    district: 'House District 50 (North Austin, Pflugerville, Round Rock)',
+    party: 'Democratic',
+    officialWebsite: 'https://house.texas.gov/members/member-page/?district=50',
+    officialProfileUrl: 'https://capitol.texas.gov/Members/MemberInfo.aspx?Leg=88&Chamber=H&Code=A2950',
+    officeAddress: 'Capitol Extension, Room E2.818, Austin, TX 78701',
+    phone: '(512) 463-0821',
+    termExpires: 'January 2027',
+    bioSummary: 'Serving in the Texas House of Representatives since 2018. Former public school teacher and education non-profit director. Member of the House Public Education and Juvenile Justice & Family Issues committees. Key legislative leader opposing private school voucher expansion and author of HB 102 establishing capping insulin copays.',
+    recentVotes: [
+      {
+        billNumber: 'TX 88(4C) HB 1',
+        billTitle: 'Raney Amendment Striking School Vouchers',
+        vote: 'Yea',
+        voteDate: '2023-11-17',
+        sourceUrl: 'https://journals.house.texas.gov/hjrnl/884/pdf/88S4HJ11-17-F.PDF',
+      },
+      {
+        billNumber: 'TX 88(R) HB 3',
+        billTitle: 'School Safety Standards & Armed Security Mandate',
+        vote: 'Nay',
+        voteDate: '2023-04-25',
+        sourceUrl: 'https://journals.house.texas.gov/hjrnl/88r/pdf/88RHJ04-25-F.PDF',
+      },
+    ],
+    sponsoredBills: [
+      {
+        billNumber: 'HB 1548',
+        billTitle: 'Public School Teacher Across-the-Board $10,000 Pay Raise',
+        status: 'In Committee',
+        officialUrl: 'https://capitol.texas.gov/BillLookup/History.aspx?LegSess=88R&Bill=HB1548',
+      },
+    ],
+    lastVerifiedAt: '2026-10-24',
+  },
+  {
+    id: 'off-txhouse-harrison',
+    photoUrl: '/images/officials/off-txhouse-harrison.jpg',
+    name: 'Brian Harrison',
+    office: 'Texas State Representative (District 10)',
+    jurisdiction: 'Texas House',
+    district: 'House District 10 (Ellis County)',
+    party: 'Republican',
+    officialWebsite: 'https://house.texas.gov/members/member-page/?district=10',
+    officialProfileUrl: 'https://capitol.texas.gov/Members/MemberInfo.aspx?Leg=88&Chamber=H&Code=A2510',
+    officeAddress: 'Capitol Extension, Room E2.716, Austin, TX 78701',
+    phone: '(512) 463-0516',
+    termExpires: 'January 2027',
+    bioSummary: 'Serving in the Texas House since 2021. Former Chief of Staff of the U.S. Department of Health and Human Services (HHS). Texas House Freedom Caucus leader focusing on eliminating executive agency rule-making overreach, border security enforcement, and cutting state expenditures.',
+    recentVotes: [
+      {
+        billNumber: 'TX 88(4C) HB 1',
+        billTitle: 'Raney Amendment Striking School Vouchers',
+        vote: 'Nay',
+        voteDate: '2023-11-17',
+        sourceUrl: 'https://journals.house.texas.gov/hjrnl/884/pdf/88S4HJ11-17-F.PDF',
+      },
+    ],
+    sponsoredBills: [],
+    lastVerifiedAt: '2026-10-24',
   },
 ];

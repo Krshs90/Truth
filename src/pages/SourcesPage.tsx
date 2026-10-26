@@ -34,7 +34,6 @@ export const SourcesPage: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto pb-12">
-      {/* Header */}
       <div>
         <h1 className="text-2xl md:text-4xl font-serif font-bold text-[#FFFFEB] tracking-tight">
           Sources, Methodology & Evidential Standards
@@ -44,7 +43,6 @@ export const SourcesPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Nonpartisan Core Mission Statement */}
       <div
         className="rounded-3xl p-6 md:p-8 border space-y-3"
         style={{
@@ -52,7 +50,7 @@ export const SourcesPage: React.FC = () => {
           borderColor: '#2A2A2A',
         }}
       >
-        <div className="flex items-center gap-2 text-blue-400 font-bold text-xs uppercase tracking-wider font-mono">
+        <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider font-mono">
           <ShieldCheck className="w-4 h-4" />
           <span>Our Nonpartisan Charter</span>
         </div>
@@ -64,7 +62,6 @@ export const SourcesPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Primary vs Secondary Sources Hierarchy */}
       <div
         className="rounded-3xl border p-6 md:p-8 space-y-5"
         style={{
@@ -73,25 +70,25 @@ export const SourcesPage: React.FC = () => {
         }}
       >
         <h2 className="text-lg font-bold text-[#FFFFEB] flex items-center gap-2">
-          <Scale className="w-5 h-5 text-blue-400" />
+          <Scale className="w-5 h-5 text-amber-400" />
           <span>Hierarchy of Evidence</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div
             className="p-5 rounded-2xl border space-y-2"
             style={{
-              background: 'rgba(59, 130, 246, 0.05)',
-              borderColor: 'rgba(59, 130, 246, 0.25)',
+              background: 'rgba(245, 158, 11, 0.05)',
+              borderColor: 'rgba(245, 158, 11, 0.25)',
             }}
           >
-            <div className="font-bold text-blue-300 text-sm flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-mono">1</span>
+            <div className="font-bold text-amber-300 text-sm flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-amber-400 text-[#141414] font-bold flex items-center justify-center text-xs font-mono">1</span>
               <span>Primary Government Sources (First Priority)</span>
             </div>
             <p className="text-slate-300 leading-relaxed opacity-90">
               Official legislative journals, enrolled bill statutes from Texas Legislature Online, official roll-call records from the U.S. Senate and House Clerks, U.S. Census Bureau ACS tables, and certified judicial opinions.
             </p>
-            <div className="text-[11px] text-blue-300 font-semibold font-mono">
+            <div className="text-[11px] text-amber-300 font-semibold font-mono">
               Rule: An introduced bill is NEVER presented as enacted law unless signed or passed over veto.
             </div>
           </div>
@@ -117,7 +114,6 @@ export const SourcesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* The 7 Analytical Verdict Categories */}
       <div
         className="rounded-3xl border p-6 md:p-8 space-y-4"
         style={{
@@ -186,7 +182,6 @@ export const SourcesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Directory of Trusted Sources */}
       <div
         className="rounded-3xl border p-6 md:p-8 space-y-4"
         style={{
@@ -196,7 +191,7 @@ export const SourcesPage: React.FC = () => {
       >
         <div>
           <h2 className="text-lg font-bold text-[#FFFFEB] flex items-center gap-2">
-            <Database className="w-5 h-5 text-blue-400" />
+            <Database className="w-5 h-5 text-amber-400" />
             <span>Trusted Sources Directory ({TRUSTED_SOURCES.length})</span>
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -220,7 +215,7 @@ export const SourcesPage: React.FC = () => {
                 <div className="flex items-center justify-between gap-1">
                   <h3 className="font-bold text-[#FFFFEB] text-sm">{src.title}</h3>
                   {src.isPrimarySource && (
-                    <span className="text-[10px] font-mono font-bold bg-blue-950/60 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-mono font-bold bg-amber-950/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full">
                       PRIMARY
                     </span>
                   )}
@@ -237,7 +232,7 @@ export const SourcesPage: React.FC = () => {
                   href={src.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 font-semibold"
+                  className="text-amber-400 hover:text-amber-300 inline-flex items-center gap-1 font-semibold"
                 >
                   <span>Visit Portal</span>
                   <ExternalLink className="w-3 h-3" />
@@ -248,7 +243,6 @@ export const SourcesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Data Provenance Table */}
       <div
         className="rounded-3xl border p-6 md:p-8 space-y-4"
         style={{
@@ -258,7 +252,7 @@ export const SourcesPage: React.FC = () => {
       >
         <div>
           <h2 className="text-lg font-bold text-[#FFFFEB] flex items-center gap-2">
-            <FileText className="w-5 h-5 text-blue-400" />
+            <FileText className="w-5 h-5 text-amber-400" />
             <span>Data Provenance & Audit Log</span>
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -283,7 +277,7 @@ export const SourcesPage: React.FC = () => {
                   <td className="p-3 font-semibold text-[#FFFFEB]">{p.recordName}</td>
                   <td className="p-3">{p.sourceEntity}</td>
                   <td className="p-3 font-mono text-[11px] text-slate-400">{p.retrievalDate}</td>
-                  <td className="p-3 font-mono text-[11px] text-blue-400">{p.verificationMethod}</td>
+                  <td className="p-3 font-mono text-[11px] text-amber-400">{p.verificationMethod}</td>
                   <td className="p-3 text-slate-400">{p.licenseOrTerms}</td>
                 </tr>
               ))}
@@ -292,7 +286,6 @@ export const SourcesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Correction & Feedback Policy Form */}
       <div
         className="rounded-3xl border p-6 md:p-8 space-y-4"
         style={{
@@ -302,7 +295,7 @@ export const SourcesPage: React.FC = () => {
       >
         <div>
           <h2 className="text-lg font-bold text-[#FFFFEB] flex items-center gap-2">
-            <Send className="w-5 h-5 text-blue-400" />
+            <Send className="w-5 h-5 text-amber-400" />
             <span>Corrections & Public Audit Policy</span>
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -330,7 +323,7 @@ export const SourcesPage: React.FC = () => {
                   value={claimIdInput}
                   onChange={(e) => setClaimIdInput(e.target.value)}
                   placeholder="e.g. claim-tx-tax-cut-18b or bill number"
-                  className="w-full p-2.5 rounded-xl text-xs text-[#FFFFEB] border focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                  className="w-full p-2.5 rounded-xl text-xs text-[#FFFFEB] border focus:outline-hidden focus:ring-1 focus:ring-amber-400/50 focus:border-amber-400"
                   style={{
                     background: '#242424',
                     borderColor: '#2F2F2F',
@@ -347,7 +340,7 @@ export const SourcesPage: React.FC = () => {
                   value={sourceUrlInput}
                   onChange={(e) => setSourceUrlInput(e.target.value)}
                   placeholder="https://capitol.texas.gov/..."
-                  className="w-full p-2.5 rounded-xl text-xs text-[#FFFFEB] border focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                  className="w-full p-2.5 rounded-xl text-xs text-[#FFFFEB] border focus:outline-hidden focus:ring-1 focus:ring-amber-400/50 focus:border-amber-400"
                   style={{
                     background: '#242424',
                     borderColor: '#2F2F2F',
@@ -365,7 +358,7 @@ export const SourcesPage: React.FC = () => {
                 value={notesInput}
                 onChange={(e) => setNotesInput(e.target.value)}
                 placeholder="Explain the specific factual error or omitted legislative history..."
-                className="w-full p-2.5 rounded-xl text-xs text-[#FFFFEB] border focus:outline-hidden focus:ring-1 focus:ring-blue-500"
+                className="w-full p-2.5 rounded-xl text-xs text-[#FFFFEB] border focus:outline-hidden focus:ring-1 focus:ring-amber-400/50 focus:border-amber-400"
                 style={{
                   background: '#242424',
                   borderColor: '#2F2F2F',
@@ -373,14 +366,12 @@ export const SourcesPage: React.FC = () => {
               />
             </div>
 
-            <motion.button
-              whileHover={{ y: -1 }}
-              whileTap={{ scale: 0.97 }}
+            <button
               type="submit"
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs transition-colors cursor-pointer shadow-sm"
+              className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-[#141414] font-semibold rounded-xl text-xs transition-colors cursor-pointer shadow-sm"
             >
               Submit Evidence for Review
-            </motion.button>
+            </button>
           </form>
         )}
       </div>

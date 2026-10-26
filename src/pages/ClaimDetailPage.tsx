@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   BookOpen,
@@ -55,7 +54,7 @@ export const ClaimDetailPage: React.FC = () => {
         </p>
         <Link
           to="/investigate"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-sm font-semibold hover:bg-blue-500 transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-400 text-[#141414] rounded-2xl text-sm font-semibold hover:bg-amber-300 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Return to Investigation Workspace</span>
@@ -74,7 +73,6 @@ export const ClaimDetailPage: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto pb-12">
-      {/* Back and Action Toolbar */}
       <div className="flex items-center justify-between">
         <Link
           to="/investigate"
@@ -85,9 +83,7 @@ export const ClaimDetailPage: React.FC = () => {
         </Link>
 
         <div className="flex items-center gap-2">
-          <motion.button
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.97 }}
+          <button
             onClick={handleCopyLink}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl border text-slate-300 hover:text-white transition-colors cursor-pointer"
             style={{
@@ -97,10 +93,8 @@ export const ClaimDetailPage: React.FC = () => {
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>{copiedLink ? 'Link Copied!' : 'Share Dossier'}</span>
-          </motion.button>
-          <motion.button
-            whileHover={{ y: -1 }}
-            whileTap={{ scale: 0.97 }}
+          </button>
+          <button
             onClick={() => window.print()}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl border text-slate-300 hover:text-white transition-colors cursor-pointer"
             style={{
@@ -110,11 +104,10 @@ export const ClaimDetailPage: React.FC = () => {
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print Dossier</span>
-          </motion.button>
+          </button>
         </div>
       </div>
 
-      {/* Primary Dossier Header Card */}
       <div
         className="rounded-3xl border p-7 md:p-9 space-y-6"
         style={{
@@ -139,10 +132,9 @@ export const ClaimDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 1: Original Claim */}
         <div className="space-y-3">
           <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 font-mono">
-            <FileText className="w-3.5 h-3.5 text-blue-400" />
+            <FileText className="w-3.5 h-3.5 text-amber-400" />
             <span>1. Submitted Claim Under Investigation</span>
           </div>
 
@@ -167,7 +159,6 @@ export const ClaimDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Section 2: Executive Summary Explanation */}
         <div
           className="rounded-2xl p-5 border space-y-3"
           style={{
@@ -176,7 +167,7 @@ export const ClaimDetailPage: React.FC = () => {
           }}
         >
           <div className="text-xs font-bold text-[#FFFFEB] uppercase tracking-wider flex items-center gap-1.5 font-mono">
-            <Info className="w-4 h-4 text-blue-400" />
+            <Info className="w-4 h-4 text-amber-400" />
             <span>2. Grounded Analytical Summary</span>
           </div>
 
@@ -196,7 +187,6 @@ export const ClaimDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Section 3: Decomposition of Factual Assertions */}
       <section
         className="rounded-3xl border p-6 md:p-8 space-y-4"
         style={{
@@ -205,20 +195,19 @@ export const ClaimDetailPage: React.FC = () => {
         }}
       >
         <div className="flex items-center gap-2">
-          <Scale className="w-5 h-5 text-blue-400" />
+          <Scale className="w-5 h-5 text-amber-400" />
           <h2 className="text-base font-bold text-[#FFFFEB]">
-            3. Decomposition of Factual Assertions
+            3. Decomposition of Testable Claims & Assertions
           </h2>
         </div>
         <p className="text-xs text-slate-400">
-          Truth isolates individual factual assertions from subjective rhetoric or forward-looking predictions, testing whether public records verify each component.
+          Truth isolates individual testable statements of fact from subjective rhetoric or forward-looking predictions, testing whether public records verify each component.
         </p>
 
         <div className="space-y-3 pt-2">
           {assessment.keyAssertions.map((asrt, index) => (
-            <motion.div
+            <div
               key={asrt.id || index}
-              whileHover={{ y: -1 }}
               className="p-4 rounded-2xl border space-y-2"
               style={{
                 background: '#242424',
@@ -231,7 +220,15 @@ export const ClaimDetailPage: React.FC = () => {
                     {index + 1}
                   </span>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[#1A1A1A] text-slate-300 border border-[#333333] uppercase tracking-wide">
-                    {asrt.assertionType.replace('_', ' ')}
+                    {asrt.assertionType === 'factual'
+                      ? 'Empirical Claim (Testable)'
+                      : asrt.assertionType === 'opinion'
+                      ? 'Subjective Opinion'
+                      : asrt.assertionType === 'prediction'
+                      ? 'Future Prediction'
+                      : asrt.assertionType === 'value_judgment'
+                      ? 'Value Judgment'
+                      : 'Testable Claim'}
                   </span>
                 </div>
                 <div>
@@ -251,7 +248,17 @@ export const ClaimDetailPage: React.FC = () => {
                     {asrt.status === 'supported' && <CheckCircle2 className="w-3 h-3" />}
                     {asrt.status === 'contradicted' && <XCircle className="w-3 h-3" />}
                     {asrt.status === 'misleading' && <AlertTriangle className="w-3 h-3" />}
-                    <span>Status: {asrt.status.toUpperCase()}</span>
+                    <span>
+                      {asrt.status === 'supported'
+                        ? 'VERIFIED BY RECORDS'
+                        : asrt.status === 'contradicted'
+                        ? 'CONTRADICTED BY RECORDS'
+                        : asrt.status === 'misleading'
+                        ? 'MISSING CONTEXT'
+                        : asrt.status === 'not_applicable'
+                        ? 'NOT DIRECTLY TESTABLE'
+                        : 'UNVERIFIED IN RECORDS'}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -263,14 +270,12 @@ export const ClaimDetailPage: React.FC = () => {
               <div className="text-xs text-slate-300 pl-7 leading-relaxed opacity-90">
                 {asrt.explanation}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Section 4 & 5: Supporting vs Contradicting Evidence */}
       <section className="space-y-6">
-        {/* Supporting Evidence */}
         <div
           className="rounded-3xl border p-6 md:p-8 space-y-4"
           style={{
@@ -338,7 +343,6 @@ export const ClaimDetailPage: React.FC = () => {
           )}
         </div>
 
-        {/* Contradicting or Qualifying Evidence */}
         <div
           className="rounded-3xl border p-6 md:p-8 space-y-4"
           style={{
@@ -407,7 +411,6 @@ export const ClaimDetailPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Section 6 & 9: Missing Context & Remaining Uncertainty */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
           className="rounded-3xl border p-6 space-y-3"
@@ -417,7 +420,7 @@ export const ClaimDetailPage: React.FC = () => {
           }}
         >
           <h3 className="text-sm font-bold text-[#FFFFEB] flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-blue-400" />
+            <AlertCircle className="w-4 h-4 text-amber-400" />
             <span>6. Missing Context & Omissions</span>
           </h3>
           {assessment.missingContext.length === 0 ? (
@@ -460,7 +463,6 @@ export const ClaimDetailPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Section 7 & 8: Original Source Documents */}
       <section
         className="rounded-3xl border p-6 md:p-8 space-y-4"
         style={{
@@ -469,7 +471,7 @@ export const ClaimDetailPage: React.FC = () => {
         }}
       >
         <div className="flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-blue-400" />
+          <BookOpen className="w-5 h-5 text-amber-400" />
           <h2 className="text-base font-bold text-[#FFFFEB]">
             7 & 8. Original Source Documents & Reporting Directory
           </h2>
@@ -504,7 +506,6 @@ export const ClaimDetailPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Section 10: Methodology & Limitations */}
       <div
         className="p-5 rounded-2xl border text-xs text-slate-400 space-y-2"
         style={{

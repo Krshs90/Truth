@@ -11,8 +11,8 @@ export const OrbIndicator: React.FC<OrbIndicatorProps> = ({ status = 'verified',
     switch (status) {
       case 'processing':
         return {
-          bg: '#3B82F6',
-          shadow: '0 0 16px 4px rgba(59, 130, 246, 0.7)',
+          bg: '#F59E0B',
+          shadow: '0 0 16px 4px rgba(245, 158, 11, 0.7)',
         };
       case 'verified':
         return {
