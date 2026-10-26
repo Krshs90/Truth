@@ -7,6 +7,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { CampaignRace, Candidate } from '../../types';
+import { getDistrictCountiesData } from '../../data/candidates';
 
 interface CampaignVoteBarAndCountyMapProps {
   activeRace: CampaignRace;
@@ -41,6 +42,14 @@ export const CampaignVoteBarAndCountyMap: React.FC<CampaignVoteBarAndCountyMapPr
   const getInitialCounty = (raceId: string) => {
     if (raceId === 'tx-cd10-2026') return 'travis-tx10';
     if (raceId === 'tx-cd26-2026') return 'denton';
+    if (raceId.startsWith('tx-cd')) {
+      const match = raceId.match(/tx-cd(\d+)-2026/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        const dynamicCounties = getDistrictCountiesData(num, candidateA, candidateB);
+        if (dynamicCounties.length > 0) return dynamicCounties[0].id;
+      }
+    }
     return 'tarrant';
   };
 
@@ -609,6 +618,10 @@ export const CampaignVoteBarAndCountyMap: React.FC<CampaignVoteBarAndCountyMapPr
   const getCountiesForRace = (): CountyData[] => {
     if (activeRace.id === 'tx-cd10-2026') return tx10Counties;
     if (activeRace.id === 'tx-cd26-2026') return tx26Counties;
+    if (isDistrictRace && districtNumber) {
+      const dynamicCounties = getDistrictCountiesData(parseInt(districtNumber, 10), candidateA, candidateB);
+      if (dynamicCounties && dynamicCounties.length > 0) return dynamicCounties;
+    }
     return statewideCounties;
   };
 

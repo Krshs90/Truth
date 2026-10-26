@@ -19,7 +19,7 @@
   <img alt="Vite" src="https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white" />
   <img alt="Electron" src="https://img.shields.io/badge/Electron-desktop-47848f?logo=electron&logoColor=white" />
   <img alt="Tailwind" src="https://img.shields.io/badge/Tailwind-4-06b6d4?logo=tailwindcss&logoColor=white" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-37%20passing-2ea043" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-39%20passing-2ea043" />
   <img alt="No API keys" src="https://img.shields.io/badge/API%20keys-none%20needed-8957e5" />
 </p>
 
@@ -57,7 +57,7 @@ I wanted a tool that does the digging for you, without telling you who to vote f
 
 ### Download (Windows)
 
-Grab **`Truth-V1-win-x64.zip`** from the [latest release](https://github.com/Krshs90/Truth/releases/latest), unzip it, and double-click `Truth.exe`. No install and no accounts are needed. The app isn't code-signed, so Windows SmartScreen may warn you the first time. Click **More info → Run anyway**.
+Grab **`Truth-V1.0.1-win-x64.zip`** from the [latest release](https://github.com/Krshs90/Truth/releases/latest), unzip it, and double-click `Truth.exe`. No install and no accounts are needed. The app isn't code-signed, so Windows SmartScreen may warn you the first time. Click **More info → Run anyway**.
 
 ### From source
 

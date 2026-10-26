@@ -1,6 +1,14 @@
 import { Candidate, CampaignRace } from '../types';
+import {
+  ALL_DISTRICT_CANDIDATES,
+  ALL_DISTRICT_CAMPAIGN_RACES,
+  getCampaignRaceForDistrict,
+  getDistrictCountiesData,
+} from './allDistrictCampaigns';
 
-export const CANDIDATES: Candidate[] = [
+export { getCampaignRaceForDistrict, getDistrictCountiesData };
+
+const INITIAL_CANDIDATES: Candidate[] = [
   {
     id: 'cand-cruz-2024',
     photoUrl: '/images/officials/off-fed-cruz.jpg',
@@ -1198,7 +1206,7 @@ export const CANDIDATES: Candidate[] = [
   },
 ];
 
-export const CAMPAIGN_RACES: CampaignRace[] = [
+const INITIAL_CAMPAIGN_RACES: CampaignRace[] = [
   {
     id: 'tx-statewide-2026',
     name: '2026 Texas Statewide Campaign: Ken Paxton (R) vs. James Talarico (D)',
@@ -1292,4 +1300,16 @@ export const CAMPAIGN_RACES: CampaignRace[] = [
     primaryRunoffDate: '2026-05-26',
     generalElectionDate: '2026-11-03',
   },
+];
+
+// Export merged CANDIDATES covering statewide + all 38 Congressional Districts
+export const CANDIDATES: Candidate[] = [
+  ...INITIAL_CANDIDATES,
+  ...ALL_DISTRICT_CANDIDATES.filter((c) => !INITIAL_CANDIDATES.some((ic) => ic.id === c.id)),
+];
+
+// Export merged CAMPAIGN_RACES covering statewide + all 38 Congressional Districts
+export const CAMPAIGN_RACES: CampaignRace[] = [
+  ...INITIAL_CAMPAIGN_RACES,
+  ...ALL_DISTRICT_CAMPAIGN_RACES.filter((r) => !INITIAL_CAMPAIGN_RACES.some((ir) => ir.id === r.id)),
 ];

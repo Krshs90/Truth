@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useCivic } from '../context/CivicContext';
 import { OFFICIALS } from '../data/officials';
-import { CAMPAIGN_RACES, CANDIDATES } from '../data/candidates';
+import { CAMPAIGN_RACES, CANDIDATES, getCampaignRaceForDistrict } from '../data/candidates';
 import { VerdictBadge } from '../components/ui/VerdictBadge';
 import { ClaimVerdict } from '../types';
 import { investigateClaim } from '../services/investigationEngine';
@@ -109,9 +109,7 @@ export const OverviewPage: React.FC = () => {
   const [liveSearchQuery, setLiveSearchQuery] = useState('');
   const [feedViewMode, setFeedViewMode] = useState<'all' | 'saved'>('all');
 
-  const districtCampaign = CAMPAIGN_RACES.find(
-    (r) => r.id === `tx-cd${selectedCongressional.districtNumber}-2026`
-  );
+  const districtCampaign = getCampaignRaceForDistrict(selectedCongressional.districtNumber);
   const statewideCampaign = CAMPAIGN_RACES.find((r) => r.id === 'tx-statewide-2026') || CAMPAIGN_RACES[0];
 
   const [activeCampaignView, setActiveCampaignView] = useState<'district' | 'statewide'>('district');
@@ -121,8 +119,8 @@ export const OverviewPage: React.FC = () => {
   }, [selectedCongressional.districtNumber]);
 
   const activeCampaign = (activeCampaignView === 'district' && districtCampaign) ? districtCampaign : statewideCampaign;
-  const candA = CANDIDATES.find((c) => c.id === activeCampaign.candidateAId);
-  const candB = CANDIDATES.find((c) => c.id === activeCampaign.candidateBId);
+  const candA = CANDIDATES.find((c) => c.id === activeCampaign.candidateAId) || CANDIDATES[0];
+  const candB = CANDIDATES.find((c) => c.id === activeCampaign.candidateBId) || CANDIDATES[1];
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [verifiedMap, setVerifiedMap] = useState<Record<string, any>>({});
   const [expandedClaimIds, setExpandedClaimIds] = useState<Set<string>>(new Set());

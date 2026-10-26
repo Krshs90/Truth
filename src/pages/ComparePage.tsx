@@ -17,7 +17,7 @@ import {
   Info,
   Calendar,
 } from 'lucide-react';
-import { CANDIDATES, CAMPAIGN_RACES } from '../data/candidates';
+import { CANDIDATES, CAMPAIGN_RACES, getCampaignRaceForDistrict } from '../data/candidates';
 import { NonpartisanDisclaimer } from '../components/ui/NonpartisanDisclaimer';
 import { SourcePill } from '../components/ui/SourcePill';
 import { CustomSelect } from '../components/ui/CustomSelect';
@@ -29,18 +29,29 @@ export const ComparePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const raceQuery = searchParams.get('race');
 
+  const userDistrictRace = useMemo(() => {
+    return getCampaignRaceForDistrict(selectedCongressional.districtNumber);
+  }, [selectedCongressional.districtNumber]);
+
+  const keyRaces = useMemo(() => {
+    return CAMPAIGN_RACES.filter((r) => r.id === 'tx-statewide-2026' || r.id === 'tx-senate-2026' || r.id === 'tx-ltgov-2026');
+  }, []);
+
+  const allDistrictRaces = useMemo(() => {
+    return CAMPAIGN_RACES.filter((r) => r.id.startsWith('tx-cd'));
+  }, []);
+
   const initialRaceId = useMemo(() => {
     if (raceQuery && CAMPAIGN_RACES.some((r) => r.id === raceQuery)) {
       return raceQuery;
     }
-    const districtRaceId = `tx-cd${selectedCongressional.districtNumber}-2026`;
-    if (CAMPAIGN_RACES.some((r) => r.id === districtRaceId)) {
-      return districtRaceId;
+    if (userDistrictRace) {
+      return userDistrictRace.id;
     }
     return 'tx-statewide-2026';
-  }, [raceQuery, selectedCongressional.districtNumber]);
+  }, [raceQuery, userDistrictRace]);
 
-  const initialRace = CAMPAIGN_RACES.find((r) => r.id === initialRaceId) || CAMPAIGN_RACES[0];
+  const initialRace = CAMPAIGN_RACES.find((r) => r.id === initialRaceId) || userDistrictRace || CAMPAIGN_RACES[0];
 
   const [selectedRaceId, setSelectedRaceId] = useState<string>(initialRaceId);
   const [candidateAId, setCandidateAId] = useState<string>(initialRace.candidateAId);
@@ -63,8 +74,10 @@ export const ComparePage: React.FC = () => {
   useEffect(() => {
     if (raceQuery && CAMPAIGN_RACES.some((r) => r.id === raceQuery)) {
       handleSelectRace(raceQuery);
+    } else if (!raceQuery && userDistrictRace) {
+      handleSelectRace(userDistrictRace.id);
     }
-  }, [raceQuery]);
+  }, [raceQuery, userDistrictRace]);
 
   const matchingRace = CAMPAIGN_RACES.find(
     (r) =>
@@ -124,7 +137,23 @@ export const ComparePage: React.FC = () => {
         <span className="text-xs font-mono uppercase text-stone-400 font-semibold mr-1">
           Active Races:
         </span>
-        {CAMPAIGN_RACES.map((race) => (
+        {/* User's Home District Race Button */}
+        {userDistrictRace && (
+          <button
+            type="button"
+            onClick={() => handleSelectRace(userDistrictRace.id)}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer border ${
+              selectedRaceId === userDistrictRace.id
+                ? 'bg-amber-400 text-stone-950 font-bold border-amber-300 shadow-sm'
+                : 'bg-[#181817] text-stone-300 hover:text-white border-[#2c2c2b]'
+            }`}
+          >
+            Your District (TX-{selectedCongressional.districtNumber})
+          </button>
+        )}
+
+        {/* Key Statewide Races */}
+        {keyRaces.map((race) => (
           <button
             key={race.id}
             type="button"
@@ -138,6 +167,26 @@ export const ComparePage: React.FC = () => {
             {race.name.split(':')[0]}
           </button>
         ))}
+
+        {/* Dropdown for All 38 Texas Congressional Districts */}
+        <div className="relative">
+          <select
+            value={selectedRaceId.startsWith('tx-cd') ? selectedRaceId : ''}
+            onChange={(e) => {
+              if (e.target.value) handleSelectRace(e.target.value);
+            }}
+            className="px-3 py-1.5 rounded-xl text-xs font-mono bg-[#181817] text-stone-300 border border-[#2c2c2b] focus:outline-hidden focus:border-amber-400 cursor-pointer"
+          >
+            <option value="" disabled>
+              Other Congressional Districts (TX-01 to TX-38)...
+            </option>
+            {allDistrictRaces.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name.split(':')[0]}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div
